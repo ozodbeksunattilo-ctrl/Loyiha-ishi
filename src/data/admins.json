@@ -1,0 +1,16 @@
+[
+  {
+    "id": "admin_1",
+    "email": "admin@megaedu.uz",
+    "password": "MegaEdu@2025",
+    "name": "Bosh Admin",
+    "role": "Direktor"
+  },
+  {
+    "id": "admin_2",
+    "email": "manager@megaedu.uz",
+    "password": "Manager@2025",
+    "name": "Menejer",
+    "role": "Marketing Boshqaruvi"
+  }
+]
