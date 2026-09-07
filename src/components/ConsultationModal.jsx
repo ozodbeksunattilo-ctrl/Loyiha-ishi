@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useStore } from '../store/useStore'
+import { useT, pick } from '../i18n'
 import { FaTimes, FaCheckCircle, FaUser, FaPhoneAlt, FaBookOpen, FaExclamationTriangle } from 'react-icons/fa'
 
 function ConsultationModal() {
+  const { t, lang } = useT()
   const isOpen = useStore((state) => state.isConsultationModalOpen)
   const selectedCourseForModal = useStore((state) => state.selectedCourseForModal)
   const closeModal = useStore((state) => state.closeConsultationModal)
@@ -12,7 +14,7 @@ function ConsultationModal() {
   const [formData, setFormData] = useState({
     name: '',
     phone: '+998 ',
-    course: selectedCourseForModal || courses[0]?.title || 'IT Kids & Robototexnika',
+    course: selectedCourseForModal || pick(courses[0]?.title, lang) || 'IT Kids & Robototexnika',
     note: ''
   })
 
@@ -41,8 +43,8 @@ function ConsultationModal() {
 
   const validate = () => {
     const newErrors = {}
-    if (!formData.name.trim()) newErrors.name = 'Ismingizni kiriting'
-    if (formData.phone.replace(/\s/g, '').length < 12) newErrors.phone = "To'g'ri telefon kiriting"
+    if (!formData.name.trim()) newErrors.name = t('modal.validateName')
+    if (formData.phone.replace(/\s/g, '').length < 12) newErrors.phone = t('modal.validatePhone')
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -80,26 +82,26 @@ function ConsultationModal() {
             <div className="w-16 h-16 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto text-3xl">
               <FaCheckCircle />
             </div>
-            <h3 className="text-2xl font-black text-white">Rahmat! Arizangiz qabul qilindi.</h3>
+            <h3 className="text-2xl font-black text-white"> {t('modal.successTitle')}</h3>
             <p className="text-zinc-400 text-sm max-w-sm mx-auto">
-              Tez orada mutaxassislarimiz ko'rsatilgan telefon raqami orqali siz bilan bog'lanishadi.
+              {t('modal.successDesc')}
             </p>
           </div>
         ) : (
           <div>
             <div className="text-center space-y-2 mb-6 pr-6">
               <h3 className="text-2xl font-black text-white tracking-tight leading-snug">
-                Bepul konsultatsiya uchun ma'lumotlaringizni to'ldiring
+                {t('modal.title')}
               </h3>
               <p className="text-xs sm:text-sm text-zinc-400 font-medium max-w-sm mx-auto">
-                Mutaxassislarimiz sizga mos yo'nalishni tavsiya qiladi
+                {t('modal.subtitle')}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
 
               <div>
-                <label className="block text-xs font-bold text-zinc-400 mb-1">Ismingiz *</label>
+                <label className="block text-xs font-bold text-zinc-400 mb-1">{t('modal.labelName')}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
                     <FaUser />
@@ -107,7 +109,7 @@ function ConsultationModal() {
                   <input
                     type="text"
                     required
-                    placeholder="Masalan: Anvar"
+                    placeholder={t('modal.placeholderName')}
                     value={formData.name}
                     onChange={(e) => { setFormData({ ...formData, name: e.target.value }); if (errors.name) setErrors(p => ({...p, name: ''})) }}
                     className={`${inputBase} ${errors.name
@@ -121,7 +123,7 @@ function ConsultationModal() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-400 mb-1">Telefon raqamingiz *</label>
+                <label className="block text-xs font-bold text-zinc-400 mb-1">{t('modal.labelPhone')}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
                     <FaPhoneAlt />
@@ -143,7 +145,7 @@ function ConsultationModal() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-400 mb-1">Qaysi yo'nalishga qiziqasiz?</label>
+                <label className="block text-xs font-bold text-zinc-400 mb-1">{t('modal.labelCourse')}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
                     <FaBookOpen />
@@ -154,20 +156,20 @@ function ConsultationModal() {
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium outline-none transition-all appearance-none cursor-pointer"
                   >
                     {courses.map((c) => (
-                      <option key={c.id} value={c.title}>
-                        [{c.category}] {c.title}
+                      <option key={c.id} value={pick(c.title, lang)}>
+                        [{c.category}] {pick(c.title, lang)}
                       </option>
                     ))}
-                    <option value="Umumiy Konsultatsiya">Umumiy Konsultatsiya</option>
+                    <option value={t('modal.generalConsultation')}>{t('modal.generalConsultation')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-400 mb-1">Qo'shimcha savol (ixtiyoriy)</label>
+                <label className="block text-xs font-bold text-zinc-400 mb-1">{t('modal.labelNote')}</label>
                 <textarea
                   rows="2"
-                  placeholder="Farzandingiz yoshi yoki savollaringiz..."
+                  placeholder={t('modal.placeholderNote')}
                   value={formData.note}
                   onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-sm font-medium outline-none transition-all resize-none"
@@ -178,7 +180,7 @@ function ConsultationModal() {
                 type="submit"
                 className="w-full py-4 mt-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-zinc-950 font-extrabold text-sm uppercase tracking-wider shadow-xl transition-all cursor-pointer"
               >
-                BEPUL KONSULTATSIYA OLISH
+                {t('modal.submit')}
               </button>
 
             </form>

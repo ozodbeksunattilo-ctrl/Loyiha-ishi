@@ -59,8 +59,12 @@ export const useStore = create(
       applications: initialApplications,
 
       lang: 'uz',
+      siteLang: 'uz',
+      adminLang: 'uz',
 
       setLang: (lang) => set({ lang }),
+      setSiteLang: (lang) => set({ siteLang: lang }),
+      setAdminLang: (lang) => set({ adminLang: lang }),
 
       auth: {
         isAuthenticated: false,
@@ -73,7 +77,7 @@ export const useStore = create(
       loginAdmin: (email, password) => {
         if (isBlocked()) {
           const remaining = Math.ceil((JSON.parse(localStorage.getItem(LOGIN_BLOCK_KEY)).until - Date.now()) / 60000)
-          return { success: false, message: `Juda ko'p urinish! ${remaining} daqiqadan keyin qayta urinib ko'ring.` }
+          return { success: false, messageKey: 'blocked', code: 'blocked', remaining }
         }
 
         const found = admins.find(
@@ -91,10 +95,10 @@ export const useStore = create(
 
         if (attempts >= MAX_ATTEMPTS) {
           blockLogin()
-          return { success: false, message: "Juda ko'p noto'g'ri urinish! 5 daqiqaga bloklandi." }
+          return { success: false, messageKey: 'blocked', code: 'blocked' }
         }
 
-        return { success: false, message: `Pochta yoki parol noto'g'ri! Qolgan urinish: ${MAX_ATTEMPTS - attempts}` }
+        return { success: false, messageKey: 'wrongCreds', code: 'wrongCreds', remaining: MAX_ATTEMPTS - attempts }
       },
 
       logoutAdmin: () => {

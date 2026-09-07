@@ -1,25 +1,24 @@
 import { useStore } from '../store/useStore'
 import { uz } from './translations/uz'
-import { tg } from './translations/tg'
 import { ru } from './translations/ru'
 import { en } from './translations/en'
 
 export const LANGS = [
   { code: 'uz', name: "O'zbek", flag: 'UZ' },
-  { code: 'tg', name: 'Тоҷикӣ', flag: 'TJ' },
   { code: 'ru', name: 'Русский', flag: 'RU' },
   { code: 'en', name: 'English', flag: 'EN' }
 ]
 
-const dicts = { uz, tg, ru, en }
+const dicts = { uz, ru, en }
 
 export function getDict(lang) {
   return dicts[lang] || uz
 }
 
-export function useT() {
-  const lang = useStore((state) => state.lang)
-  const setLang = useStore((state) => state.setLang)
+export function useT(scope = 'site') {
+  const isAdminScope = scope === 'admin'
+  const lang = useStore((state) => (isAdminScope ? state.adminLang : state.siteLang))
+  const setLang = useStore((state) => (isAdminScope ? state.setAdminLang : state.setSiteLang))
   const dict = dicts[lang] || uz
 
   const t = (path) => {

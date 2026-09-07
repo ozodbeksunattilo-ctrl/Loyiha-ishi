@@ -1,14 +1,17 @@
 import React from 'react'
+import { useT } from '../i18n'
 import { FaAward, FaUserGraduate, FaChalkboardTeacher, FaSmile } from 'react-icons/fa'
 
-const stats = [
-  { icon: <FaUserGraduate />, value: '2500+', label: 'Bitiruvchi o\u2018quvchilar' },
-  { icon: <FaChalkboardTeacher />, value: '25+', label: 'Tajribali ustozlar' },
-  { icon: <FaAward />, value: '98%', label: 'Mamnun ota-onalar' },
-  { icon: <FaSmile />, value: '60+', label: 'Muvaffaqiyatli loyihalar' }
-]
-
 function About() {
+  const { t } = useT()
+
+  const stats = [
+    { icon: <FaUserGraduate />, value: '2500+', label: t('about.stat1') },
+    { icon: <FaChalkboardTeacher />, value: '25+', label: t('about.stat2') },
+    { icon: <FaAward />, value: '98%', label: t('about.stat3') },
+    { icon: <FaSmile />, value: '60+', label: t('about.stat4') }
+  ]
+
   return (
     <section id="about" className="py-16 lg:py-20 bg-zinc-950 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,36 +19,35 @@ function About() {
 
           <div className="space-y-5">
             <span className="inline-block px-3 py-1 rounded-md bg-orange-500/10 border border-orange-500/25 text-orange-500 text-xs font-bold uppercase tracking-widest">
-              Biz haqimizda
+              {t('about.badge')}
             </span>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
-              MEGA EDU — bolalarni{' '}
-              <span className="text-orange-500">kelajak kasblariga</span> tayyorlaydigan zamonaviy markaz
+              {t('about.title1')}{' '}
+              <span className="text-orange-500">{t('about.title2')}</span>{' '}
+              {t('about.title3')}
             </h2>
             <p className="text-zinc-400 leading-relaxed">
-              Biz bugungi raqamli davrda bola uchun eng muhim ko'nikmalar — dasturlash, xalqaro tillar va
-              mantiqiy fikrlashni to'g'ri shakllantiramiz. Har bir o'quvchi yoshiga mos dasturda, kichik
-              guruhlarda, amaliyotga yo'naltirilgan holda ta'lim oladi.
+              {t('about.desc')}
             </p>
             <ul className="space-y-3">
               <li className="flex items-start gap-3 text-sm text-zinc-300">
                 <span className="mt-0.5 w-5 h-5 rounded-md bg-orange-500/15 text-orange-500 flex items-center justify-center flex-shrink-0"><span className="text-[10px] font-bold">1</span></span>
-                Yosh toifalariga moslashtirilgan o'quv dasturlari
+                {t('about.item1')}
               </li>
               <li className="flex items-start gap-3 text-sm text-zinc-300">
                 <span className="mt-0.5 w-5 h-5 rounded-md bg-orange-500/15 text-orange-500 flex items-center justify-center flex-shrink-0"><span className="text-[10px] font-bold">2</span></span>
-                Real loyihalar va portfolio ustida amaliy ishlash
+                {t('about.item2')}
               </li>
               <li className="flex items-start gap-3 text-sm text-zinc-300">
                 <span className="mt-0.5 w-5 h-5 rounded-md bg-orange-500/15 text-orange-500 flex items-center justify-center flex-shrink-0"><span className="text-[10px] font-bold">3</span></span>
-                Har oyda ota-onalar uchun hisobot va nazorat
+                {t('about.item3')}
               </li>
             </ul>
             <a
               href="#courses"
               className="inline-flex items-center gap-2 text-sm font-bold text-orange-500 hover:text-orange-400 transition-colors"
             >
-              Kurslarimiz bilan tanishing
+              {t('about.link')}
               <span className="text-base">→</span>
             </a>
           </div>

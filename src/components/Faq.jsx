@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { useStore } from '../store/useStore'
+import { useT, pick } from '../i18n'
 import { FaPlus, FaMinus } from 'react-icons/fa'
 
 function Faq() {
+  const { t, lang } = useT()
   const faqs = useStore((state) => state.faqs)
   const [openId, setOpenId] = useState(null)
 
@@ -12,11 +14,11 @@ function Faq() {
 
         <div className="text-center space-y-4 mb-12">
           <span className="inline-block px-3 py-1 rounded-md bg-orange-500/10 border border-orange-500/25 text-orange-500 text-xs font-bold uppercase tracking-widest">
-            Savol-javob
+            {t('faq.badge')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
-            Ko'p so'raladigan{' '}
-            <span className="text-orange-500">savollar</span>
+            {t('faq.title1')}{' '}
+            <span className="text-orange-500">{t('faq.title2')}</span>
           </h2>
         </div>
 
@@ -35,14 +37,14 @@ function Faq() {
                   onClick={() => setOpenId(isOpen ? null : faq.id)}
                   className="w-full px-5 py-4 flex items-center justify-between text-left gap-4 cursor-pointer"
                 >
-                  <span className="font-semibold text-sm sm:text-base text-white leading-snug">{faq.question}</span>
+                  <span className="font-semibold text-sm sm:text-base text-white leading-snug">{pick(faq.question, lang)}</span>
                   <span className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${isOpen ? 'bg-orange-500 text-zinc-950' : 'bg-zinc-800 text-orange-400'}`}>
                     {isOpen ? <FaMinus className="text-xs" /> : <FaPlus className="text-xs" />}
                   </span>
                 </button>
                 <div className={`transition-all duration-300 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
                   <p className="px-5 pb-5 text-sm text-zinc-400 leading-relaxed border-t border-zinc-800/60 pt-4">
-                    {faq.answer}
+                    {pick(faq.answer, lang)}
                   </p>
                 </div>
               </div>

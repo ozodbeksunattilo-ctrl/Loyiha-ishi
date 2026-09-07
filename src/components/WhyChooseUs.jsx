@@ -1,8 +1,10 @@
 import React from 'react'
 import { useStore } from '../store/useStore'
+import { useT, pick } from '../i18n'
 import { FaLaptopCode, FaUserCheck, FaGamepad, FaAward, FaCertificate, FaProjectDiagram } from 'react-icons/fa'
 
 function WhyChooseUs() {
+  const { t, lang } = useT()
   const advantages = useStore((state) => state.advantages)
 
   const icons = [
@@ -20,11 +22,11 @@ function WhyChooseUs() {
 
         <div className="text-center max-w-2xl mx-auto space-y-4">
           <span className="inline-block px-3 py-1 rounded-md bg-orange-500/10 border border-orange-500/25 text-orange-500 text-xs font-bold uppercase tracking-widest">
-            Nega biz?
+            {t('why.badge')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
-            «MEGA EDU»ni {' '}
-            <span className="text-orange-500">tanlashning sabablari</span>
+            {t('why.title1')}{' '}
+            <span className="text-orange-500">{t('why.title2')}</span>
           </h2>
         </div>
 
@@ -40,8 +42,8 @@ function WhyChooseUs() {
                 </div>
                 <span className="text-xs font-black text-zinc-600">0{idx + 1}</span>
               </div>
-              <h3 className="font-bold text-white leading-snug">{a.title}</h3>
-              <p className="mt-2 text-sm text-zinc-400 leading-relaxed">{a.desc}</p>
+              <h3 className="font-bold text-white leading-snug">{pick(a.title, lang)}</h3>
+              <p className="mt-2 text-sm text-zinc-400 leading-relaxed">{pick(a.desc, lang)}</p>
             </div>
           ))}
         </div>

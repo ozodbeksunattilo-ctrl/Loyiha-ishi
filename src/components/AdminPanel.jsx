@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
+import { useT, pick } from '../i18n'
 import ImageUploader from './ImageUploader'
+import LField from './LField'
+import LanguageSwitcher from './LanguageSwitcher'
 import { getYouTubeThumbnail } from '../utils/media'
 import admins from '../data/admins.json'
 import {
@@ -38,6 +41,7 @@ import {
 
 function AdminPanel() {
   const store = useStore()
+  const { t, lang } = useT('admin')
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('applications')
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -67,7 +71,14 @@ function AdminPanel() {
   const [toasts, setToasts] = useState([])
   const lastAppIdRef = useRef(store.applications[0]?.id || null)
 
-  const dismissToast = (id) => setToasts((prev) => prev.filter((t) => t.id !== id))
+  const statusAll = t('admin.statusAll')
+  const statusNew = t('admin.statusNew')
+  const statusContacted = t('admin.statusContacted')
+  const statusAccepted = t('admin.statusAccepted')
+  const statusCancelled = t('admin.statusCancelled')
+  const statusList = [statusAll, statusNew, statusContacted, statusAccepted, statusCancelled]
+
+  const dismissToast = (id) => setToasts((prev) => prev.filter((tt) => tt.id !== id))
 
   useEffect(() => {
     const first = store.applications[0]
@@ -81,9 +92,14 @@ function AdminPanel() {
 
   useEffect(() => {
     if (toasts.length === 0) return
-    const timers = toasts.map((t) => setTimeout(() => dismissToast(t.id), 8000))
+    const timers = toasts.map((tt) => setTimeout(() => dismissToast(tt.id), 8000))
     return () => timers.forEach((timer) => clearTimeout(timer))
   }, [toasts])
+
+  const loginErrorMessage = (result) => {
+    if (result.code === 'blocked') return t('store.blockMessage')
+    return t('store.wrongCreds') + result.remaining
+  }
 
   const handleLoginSubmit = (e) => {
     e.preventDefault()
@@ -92,7 +108,7 @@ function AdminPanel() {
     setTimeout(() => {
       const result = store.loginAdmin(loginEmail, loginPassword)
       if (!result.success) {
-        setAuthError(result.message)
+        setAuthError(loginErrorMessage(result))
       }
       setIsLogging(false)
     }, 800)
@@ -103,7 +119,7 @@ function AdminPanel() {
     setAuthError('')
     const found = admins.find((a) => a.email.toLowerCase() === gmailEmail.trim().toLowerCase())
     if (!found) {
-      setAuthError("Bu Gmail hisobi ruxsat etilmagan.")
+      setAuthError(t('admin.gmailNotAllowed'))
       return
     }
     setGmailStep('password')
@@ -116,7 +132,7 @@ function AdminPanel() {
     setTimeout(() => {
       const result = store.loginAdmin(gmailEmail, gmailPass)
       if (!result.success) {
-        setAuthError(result.message)
+        setAuthError(loginErrorMessage(result))
       }
       setGmailLogging(false)
     }, 800)
@@ -128,12 +144,12 @@ function AdminPanel() {
     setLoginPassword('')
   }
 
-  const newLeadsCount = store.applications.filter((a) => a.status === 'Yangi').length
+  const newLeadsCount = store.applications.filter((a) => a.status === statusNew).length
 
   const handleSaveSiteInfo = (e) => {
     e.preventDefault()
     store.updateSiteInfo(siteForm)
-    alert("Sayt sozlamalari muvaffaqiyatli saqlandi!")
+    alert(t('admin.saved'))
   }
 
   const handleSaveAdvantage = (e) => {
@@ -167,7 +183,7 @@ function AdminPanel() {
     setFaqForm(null)
   }
 
-  const filteredApplications = statusFilter === 'Barchasi'
+  const filteredApplications = statusFilter === statusAll
     ? store.applications
     : store.applications.filter((a) => a.status === statusFilter)
 
@@ -175,14 +191,17 @@ function AdminPanel() {
   if (!store.auth.isAuthenticated) {
     return (
       <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-4">
+        <div className="w-full max-w-md absolute top-4 right-4 flex justify-end">
+          <LanguageSwitcher scope="admin" />
+        </div>
         <div className="max-w-md w-full space-y-6">
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
             <div className="text-center space-y-2">
               <div className="w-14 h-14 rounded-2xl bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center mx-auto text-2xl">
                 <FaUserShield />
               </div>
-              <h2 className="text-2xl font-black text-white uppercase tracking-tight">Admin Panelga Kirish</h2>
-              <p className="text-xs text-zinc-400">Faqat ruxsat berilgan admin hisoblari</p>
+              <h2 className="text-2xl font-black text-white uppercase tracking-tight">{t('admin.loginTitle')}</h2>
+              <p className="text-xs text-zinc-400">{t('admin.loginSubtitle')}</p>
             </div>
 
             {authError && (
@@ -201,19 +220,19 @@ function AdminPanel() {
                 className="w-full py-3 rounded-2xl bg-white text-zinc-800 font-bold text-sm flex items-center justify-center gap-2.5 hover:bg-zinc-100 transition-all disabled:opacity-50 cursor-pointer border border-zinc-200"
               >
                 <FaGoogle className="text-red-500 text-base" />
-                <span>{gmailLogging ? (<><FaSpinner className="animate-spin" /> Tekshirilmoqda...</>) : 'Gmail bilan kirish'}</span>
+                <span>{gmailLogging ? (<><FaSpinner className="animate-spin" /> {t('admin.checking')}</>) : t('admin.gmailLogin')}</span>
               </button>
 
               {gmailOpen && (
                 <div className="rounded-2xl border border-zinc-800 bg-zinc-950 overflow-hidden">
                   <p className="px-4 py-3 text-[11px] text-zinc-500 font-semibold border-b border-zinc-800">
-                    Google hisobingiz bilan kirish
+                    {t('admin.gmailSubtitle')}
                   </p>
 
                   {gmailStep === 'email' ? (
                     <form onSubmit={handleGmailEmailSubmit} className="p-4 space-y-3">
                       <div>
-                        <label className="block text-xs font-bold text-zinc-400 mb-1.5">Gmail manzilingiz</label>
+                        <label className="block text-xs font-bold text-zinc-400 mb-1.5">{t('admin.gmailAddress')}</label>
                         <input
                           type="email"
                           required
@@ -228,17 +247,17 @@ function AdminPanel() {
                         type="submit"
                         className="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-zinc-950 font-bold text-sm transition-colors cursor-pointer"
                       >
-                        Davom etish
+                        {t('admin.continue')}
                       </button>
                     </form>
                   ) : (
                     <form onSubmit={handleGmailPasswordSubmit} className="p-4 space-y-3">
                       <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
-                        <span className="block text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Hisob</span>
+                        <span className="block text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">{t('admin.account')}</span>
                         <span className="block text-sm font-bold text-white truncate">{gmailEmail}</span>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-zinc-400 mb-1.5">Parol</label>
+                        <label className="block text-xs font-bold text-zinc-400 mb-1.5">{t('admin.password')}</label>
                         <div className="relative">
                           <input
                             type={showGmailPass ? 'text' : 'password'}
@@ -263,14 +282,14 @@ function AdminPanel() {
                         disabled={gmailLogging}
                         className="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-zinc-950 font-bold text-sm transition-colors disabled:opacity-50 cursor-pointer"
                       >
-                        Kirish
+                        {t('admin.signIn')}
                       </button>
                       <button
                         type="button"
                         onClick={() => { setGmailStep('email'); setGmailPass(''); setAuthError('') }}
                         className="w-full text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
                       >
-                        ← Boshqa hisob
+                        {t('admin.backToLogin')}
                       </button>
                     </form>
                   )}
@@ -279,14 +298,14 @@ function AdminPanel() {
 
               <div className="flex items-center gap-3 py-1">
                 <span className="flex-1 h-px bg-zinc-800" />
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">yoki</span>
+                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{t('admin.or')}</span>
                 <span className="flex-1 h-px bg-zinc-800" />
               </div>
             </div>
 
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-zinc-400 mb-1.5">Email Manzili</label>
+                <label className="block text-xs font-bold text-zinc-400 mb-1.5">{t('admin.emailLabel')}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500">
                     <FaKey className="text-xs" />
@@ -303,7 +322,7 @@ function AdminPanel() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-400 mb-1.5">Parol</label>
+                <label className="block text-xs font-bold text-zinc-400 mb-1.5">{t('admin.password')}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500">
                     <FaLock className="text-xs" />
@@ -334,10 +353,10 @@ function AdminPanel() {
                 {isLogging ? (
                   <>
                     <FaSpinner className="animate-spin" />
-                    <span>Tekshirilmoqda...</span>
+                    <span>{t('admin.checking')}</span>
                   </>
                 ) : (
-                  <span>Tizimga Kirish</span>
+                  <span>{t('admin.signIn')}</span>
                 )}
               </button>
             </form>
@@ -348,7 +367,7 @@ function AdminPanel() {
                 className="w-full py-2 text-xs text-zinc-400 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
                 <FaArrowLeft />
-                <span>Landing Page ga qaytish</span>
+                <span>{t('admin.backToLanding')}</span>
               </button>
             </div>
           </div>
@@ -359,14 +378,14 @@ function AdminPanel() {
 
   // ======== ADMIN LAYOUT WITH SIDEBAR + TOPBAR ========
   const sidebarItems = [
-    { id: 'applications', label: 'Arizalar', icon: <FaInbox />, badge: newLeadsCount, desc: "Landing sahifadan kelgan arizalarni ko'rish va holatini boshqarish" },
-    { id: 'site', label: 'Sayt Matnlari', icon: <FaCog />, desc: "Bosh sahifadagi matnlar, rasm va kontaktlarni o'zgartirish" },
-    { id: 'advantages', label: 'Nega Biz?', icon: <FaListOl />, count: store.advantages.length, desc: "\u201CNega aynan MEGA EDU?\u201D bo'limidagi afzallik kartochkalari" },
-    { id: 'courses', label: 'Kurslar', icon: <FaBook />, count: store.courses.length, desc: "Saytdagi ta'lim kurslarini qo'shish, o'zgartirish va o'chirish" },
-    { id: 'teachers', label: "O'qituvchilar", icon: <FaUserTie />, count: store.teachers.length, desc: "Ustozlar ro'yxati, rasmlari va tajribasini boshqarish" },
-    { id: 'reviews', label: 'Otzivlar', icon: <FaComments />, count: store.reviews.length, desc: "Ota-onalar fikrlari va YouTube video otzivlar" },
-    { id: 'certs', label: 'Sertifikatlar', icon: <FaCertificate />, count: store.certificates.length, desc: "Bitiruvchilar sertifikatlarini boshqarish" },
-    { id: 'faq', label: 'Savol-Javob', icon: <FaQuestionCircle />, count: store.faqs.length, desc: "Ko'p so'raladigan savollar va ularning javoblari" },
+    { id: 'applications', label: t('admin.tabs.applications'), icon: <FaInbox />, badge: newLeadsCount, desc: t('admin.tabs.applicationsDesc') },
+    { id: 'site', label: t('admin.tabs.site'), icon: <FaCog />, desc: t('admin.tabs.siteDesc') },
+    { id: 'advantages', label: t('admin.tabs.advantages'), icon: <FaListOl />, count: store.advantages.length, desc: t('admin.tabs.advantagesDesc') },
+    { id: 'courses', label: t('admin.tabs.courses'), icon: <FaBook />, count: store.courses.length, desc: t('admin.tabs.coursesDesc') },
+    { id: 'teachers', label: t('admin.tabs.teachers'), icon: <FaUserTie />, count: store.teachers.length, desc: t('admin.tabs.teachersDesc') },
+    { id: 'reviews', label: t('admin.tabs.reviews'), icon: <FaComments />, count: store.reviews.length, desc: t('admin.tabs.reviewsDesc') },
+    { id: 'certs', label: t('admin.tabs.certs'), icon: <FaCertificate />, count: store.certificates.length, desc: t('admin.tabs.certsDesc') },
+    { id: 'faq', label: t('admin.tabs.faq'), icon: <FaQuestionCircle />, count: store.faqs.length, desc: t('admin.tabs.faqDesc') },
   ]
 
   return (
@@ -391,7 +410,7 @@ function AdminPanel() {
               </div>
               <div>
                 <p className="font-extrabold text-sm text-white leading-none">MEGA EDU</p>
-                <p className="text-[10px] text-zinc-500 font-medium">Admin Panel</p>
+                <p className="text-[10px] text-zinc-500 font-medium">{t('admin.adminPanel')}</p>
               </div>
             </div>
           )}
@@ -442,14 +461,14 @@ function AdminPanel() {
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all cursor-pointer ${!sidebarOpen ? 'justify-center' : ''}`}
           >
             <FaHome className="text-sm flex-shrink-0" />
-            {sidebarOpen && <span>Landing Page</span>}
+            {sidebarOpen && <span>{t('admin.landingPage')}</span>}
           </button>
           <button
             onClick={handleLogout}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all cursor-pointer ${!sidebarOpen ? 'justify-center' : ''}`}
           >
             <FaSignOutAlt className="text-sm flex-shrink-0" />
-            {sidebarOpen && <span>Chiqish</span>}
+            {sidebarOpen && <span>{t('admin.logout')}</span>}
           </button>
         </div>
       </aside>
@@ -471,21 +490,22 @@ function AdminPanel() {
                 {sidebarItems.find(i => i.id === activeTab)?.label || 'Admin'}
               </h1>
               <p className="text-[10px] text-zinc-500 font-medium hidden sm:block">
-                {sidebarItems.find((i) => i.id === activeTab)?.desc || 'MEGA EDU Boshqaruv Tizimi'}
+                {sidebarItems.find((i) => i.id === activeTab)?.desc || 'MEGA EDU'}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2.5 relative">
+            <LanguageSwitcher light scope="admin" />
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-800 border border-zinc-700 text-xs font-semibold text-zinc-300">
               <FaUserShield className="text-orange-400" />
-              <span>{store.auth.currentUser?.name || "Admin"}</span>
+              <span>{store.auth.currentUser?.name || 'Admin'}</span>
             </div>
 
             <button
               onClick={() => setNotifOpen(!notifOpen)}
               className="relative p-2.5 rounded-xl bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 text-zinc-300 transition-colors cursor-pointer"
-              title="Arizalar"
+              title={t('admin.tabs.applications')}
             >
               <FaBell />
               {newLeadsCount > 0 && (
@@ -500,21 +520,21 @@ function AdminPanel() {
                 <div className="fixed inset-0 z-30" onClick={() => setNotifOpen(false)} />
                 <div className="absolute top-14 right-0 z-40 w-80 bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden">
                   <div className="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
-                    <p className="text-sm font-bold text-white">Yangi Arizalar</p>
+                    <p className="text-sm font-bold text-white">{t('admin.title')}</p>
                     <button
                       onClick={() => { setActiveTab('applications'); setNotifOpen(false) }}
                       className="text-[11px] text-orange-400 hover:text-orange-300 font-semibold cursor-pointer"
                     >
-                      Barchasini ko'rish →
+                      {t('admin.viewAll')}
                     </button>
                   </div>
                   <div className="max-h-80 overflow-y-auto divide-y divide-zinc-800/70">
                     {store.applications.length === 0 ? (
-                      <p className="px-4 py-6 text-center text-xs text-zinc-500">Hozircha arizalar yo'q</p>
+                      <p className="px-4 py-6 text-center text-xs text-zinc-500">{t('admin.noApps')}</p>
                     ) : (
                       store.applications.slice(0, 6).map((app) => (
                         <div key={app.id} className="flex items-start gap-3 px-4 py-3">
-                          <span className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center text-xs flex-shrink-0 ${app.status === 'Yangi' ? 'bg-red-500/15 text-red-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
+                          <span className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center text-xs flex-shrink-0 ${app.status === statusNew ? 'bg-red-500/15 text-red-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
                             <FaInbox />
                           </span>
                           <div className="min-w-0 flex-1">
@@ -523,7 +543,7 @@ function AdminPanel() {
                             <p className="text-[11px] text-zinc-500">{app.phone}</p>
                             <p className="text-[10px] text-zinc-600">{app.createdAt}</p>
                           </div>
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold flex-shrink-0 ${app.status === 'Yangi' ? 'bg-red-500/15 text-red-400' : 'bg-zinc-800 text-zinc-400'}`}>
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold flex-shrink-0 ${app.status === statusNew ? 'bg-red-500/15 text-red-400' : 'bg-zinc-800 text-zinc-400'}`}>
                             {app.status}
                           </span>
                         </div>
@@ -534,7 +554,7 @@ function AdminPanel() {
                     <div className="px-4 py-2.5 border-t border-zinc-800 bg-zinc-950">
                       <p className="text-[11px] text-zinc-500 flex items-center gap-1.5">
                         <FaCheckDouble className="text-zinc-600" />
-                        Arizalar sahifasida holatini yangilashingiz mumkin
+                        {t('admin.updateStatus')}
                       </p>
                     </div>
                   )}
@@ -544,13 +564,13 @@ function AdminPanel() {
 
             <button
               onClick={() => {
-                if (window.confirm("Barcha ma'lumotlarni boshlang'ich holatga qaytarishni xohlaysizmi?")) {
+                if (window.confirm(t('admin.resetConfirm'))) {
                   store.resetToDefault()
                   setSiteForm(useStore.getState().siteInfo)
                 }
               }}
               className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs transition-colors cursor-pointer"
-              title="Reset"
+              title={t('admin.reset')}
             >
               <FaSyncAlt />
             </button>
@@ -565,11 +585,11 @@ function AdminPanel() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-black uppercase text-white">Kelib tushgan Arizalar</h2>
-                  <p className="text-xs text-zinc-400 mt-1">Landing page dan yuborilgan barcha konsultatsiya so'rovlari</p>
+                  <h2 className="text-xl font-black uppercase text-white">{t('admin.appsTitle')}</h2>
+                  <p className="text-xs text-zinc-400 mt-1">{t('admin.appsDesc')}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {['Barchasi', 'Yangi', "Bog'lanildi", 'Qabul qilindi', 'Bekor qilindi'].map((st) => (
+                  {statusList.map((st) => (
                     <button
                       key={st}
                       onClick={() => setStatusFilter(st)}
@@ -587,7 +607,7 @@ function AdminPanel() {
 
               {filteredApplications.length === 0 ? (
                 <div className="p-16 text-center bg-zinc-900/50 rounded-3xl border border-zinc-800 text-zinc-400 text-sm">
-                  Arizalar mavjud emas.
+                  {t('admin.noAppsTitle')}
                 </div>
               ) : (
                 <div className="grid gap-4">
@@ -598,9 +618,9 @@ function AdminPanel() {
                           <span className="font-extrabold text-base text-white">{app.name}</span>
                           <span className="text-xs text-orange-400 font-bold px-2.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">{app.course}</span>
                           <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
-                            app.status === 'Yangi' ? 'bg-red-500 text-white' :
-                            app.status === "Bog'lanildi" ? 'bg-amber-500 text-zinc-950' :
-                            app.status === 'Qabul qilindi' ? 'bg-emerald-500 text-white' : 'bg-zinc-700 text-zinc-300'
+                            app.status === statusNew ? 'bg-red-500 text-white' :
+                            app.status === statusContacted ? 'bg-amber-500 text-zinc-950' :
+                            app.status === statusAccepted ? 'bg-emerald-500 text-white' : 'bg-zinc-700 text-zinc-300'
                           }`}>
                             {app.status}
                           </span>
@@ -621,12 +641,12 @@ function AdminPanel() {
                           onChange={(e) => store.updateApplicationStatus(app.id, e.target.value)}
                           className="px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-700 text-xs font-bold text-white outline-none cursor-pointer"
                         >
-                          <option value="Yangi">Yangi</option>
-                          <option value="Bog'lanildi">Bog'lanildi</option>
-                          <option value="Qabul qilindi">Qabul qilindi</option>
-                          <option value="Bekor qilindi">Bekor qilindi</option>
+                          <option value={statusNew}>{statusNew}</option>
+                          <option value={statusContacted}>{statusContacted}</option>
+                          <option value={statusAccepted}>{statusAccepted}</option>
+                          <option value={statusCancelled}>{statusCancelled}</option>
                         </select>
-                        <button onClick={() => store.deleteApplication(app.id)} className="p-2.5 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-colors cursor-pointer" title="O'chirish">
+                        <button onClick={() => store.deleteApplication(app.id)} className="p-2.5 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-colors cursor-pointer" title={t('admin.titleAttr')}>
                           <FaTrash className="text-xs" />
                         </button>
                       </div>
@@ -641,8 +661,8 @@ function AdminPanel() {
           {activeTab === 'site' && (
             <form onSubmit={handleSaveSiteInfo} className="max-w-4xl space-y-6 bg-zinc-900 p-6 sm:p-8 rounded-3xl border border-zinc-800">
               <div>
-                <h2 className="text-xl font-black uppercase text-white border-b border-zinc-800 pb-3">Sayt Matnlari</h2>
-                <p className="text-xs text-zinc-500 mt-2">Bu bo'limdagi matnlar landing sahifada ko'rinadi. Har bir maydon ostida nima yozish kerakligi ko'rsatilgan.</p>
+                <h2 className="text-xl font-black uppercase text-white border-b border-zinc-800 pb-3">{t('admin.siteTitle')}</h2>
+                <p className="text-xs text-zinc-500 mt-2">{t('admin.siteHint')}</p>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -653,9 +673,11 @@ function AdminPanel() {
                   <label className="block text-xs font-bold text-orange-400 mb-1">Asosiy Telefon Raqami</label>
                   <input type="text" value={siteForm.headerPhone || ''} onChange={(e) => setSiteForm({ ...siteForm, headerPhone: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-orange-500 text-sm font-extrabold text-orange-400 outline-none" />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-zinc-400 mb-1">O'quvchilar soni matni</label>
-                  <input type="text" value={siteForm.studentCountText || ''} onChange={(e) => setSiteForm({ ...siteForm, studentCountText: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm font-semibold text-white outline-none focus:border-orange-500" />
+                <div className="md:col-span-2">
+                  <LField value={siteForm.tagline} onChange={(v) => setSiteForm({ ...siteForm, tagline: v })} label="Tagline" textarea />
+                </div>
+                <div className="md:col-span-2">
+                  <LField value={siteForm.studentCountText} onChange={(v) => setSiteForm({ ...siteForm, studentCountText: v })} label="O'quvchilar soni matni" />
                 </div>
                 <div className="md:col-span-2">
                   <ImageUploader
@@ -671,12 +693,10 @@ function AdminPanel() {
                   <p className="text-[10px] text-zinc-500 mt-1">Bosish orqali qo'ng'iroq qilish uchun: 998770272300</p>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 mb-1">Manzil</label>
-                  <input type="text" value={siteForm.address || ''} onChange={(e) => setSiteForm({ ...siteForm, address: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm font-semibold text-white outline-none focus:border-orange-500" />
+                  <LField value={siteForm.address} onChange={(v) => setSiteForm({ ...siteForm, address: v })} label="Manzil" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 mb-1">Ish vaqti</label>
-                  <input type="text" value={siteForm.workingHours || ''} onChange={(e) => setSiteForm({ ...siteForm, workingHours: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm font-semibold text-white outline-none focus:border-orange-500" />
+                  <LField value={siteForm.workingHours} onChange={(v) => setSiteForm({ ...siteForm, workingHours: v })} label="Ish vaqti" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-red-400 mb-1">Promo YouTube Video Link</label>
@@ -685,20 +705,12 @@ function AdminPanel() {
               </div>
               <div className="space-y-4 pt-2">
                 <p className="text-xs font-bold text-zinc-400 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5">
-                  Bosh sahifa sarlavhasi 3 qismdan iborat: 1-qism (oq matn) — 2-qism (to'q sariq matn) — 3-qism (oq matn). Uchasi birlashib bitta gap hosil qiladi.
+                  Bosh sahifa sarlavhasi 3 qismdan iborat: 1-qism (oq matn) — 2-qism (to'q sariq matn) — 3-qism (oq matn).
                 </p>
-                <div>
-                  <label className="block text-xs font-bold text-zinc-400 mb-1">Hero Sarlavha (1-qism)</label>
-                  <input type="text" value={siteForm.heroTitleStart || ''} onChange={(e) => setSiteForm({ ...siteForm, heroTitleStart: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm font-bold text-white outline-none focus:border-orange-500" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-zinc-400 mb-1">Hero Rangli Sarlavha (2-qism)</label>
-                  <input type="text" value={siteForm.heroTitleHighlight || ''} onChange={(e) => setSiteForm({ ...siteForm, heroTitleHighlight: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm font-bold text-amber-400 outline-none focus:border-orange-500" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-zinc-400 mb-1">Hero Subtitle</label>
-                  <textarea rows="2" value={siteForm.heroSubtitle || ''} onChange={(e) => setSiteForm({ ...siteForm, heroSubtitle: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm text-white outline-none focus:border-orange-500" />
-                </div>
+                <LField value={siteForm.heroTitleStart} onChange={(v) => setSiteForm({ ...siteForm, heroTitleStart: v })} label="Hero Sarlavha (1-qism)" />
+                <LField value={siteForm.heroTitleHighlight} onChange={(v) => setSiteForm({ ...siteForm, heroTitleHighlight: v })} label="Hero Rangli Sarlavha (2-qism)" />
+                <LField value={siteForm.heroTitleEnd} onChange={(v) => setSiteForm({ ...siteForm, heroTitleEnd: v })} label="Hero Sarlavha (3-qism)" />
+                <LField value={siteForm.heroSubtitle} onChange={(v) => setSiteForm({ ...siteForm, heroSubtitle: v })} label="Hero Subtitle" textarea />
               </div>
               <div className="grid md:grid-cols-3 gap-4 pt-2">
                 <div>
@@ -714,7 +726,7 @@ function AdminPanel() {
                   <input type="text" value={siteForm.youtubeUrl || ''} onChange={(e) => setSiteForm({ ...siteForm, youtubeUrl: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-medium text-white outline-none" />
                 </div>
               </div>
-              <button type="submit" className="px-6 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-zinc-950 font-black text-sm uppercase tracking-wider transition-colors cursor-pointer">Sozlamalarni Saqlash</button>
+              <button type="submit" className="px-6 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-zinc-950 font-black text-sm uppercase tracking-wider transition-colors cursor-pointer">{t('admin.save')}</button>
             </form>
           )}
 
@@ -722,31 +734,27 @@ function AdminPanel() {
           {activeTab === 'advantages' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-black uppercase text-white">Afzalliklar Boshqaruvi</h2>
-                <button onClick={() => setAdvForm({ num: `0${store.advantages.length + 1}`, title: '', desc: '' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
-                  <FaPlus /> Yangi Qo'shish
+                <h2 className="text-xl font-black uppercase text-white">{t('admin.tabs.advantages')}</h2>
+                <button onClick={() => setAdvForm({ num: `0${store.advantages.length + 1}`, title: { uz: '', tg: '', ru: '', en: '' }, desc: { uz: '', tg: '', ru: '', en: '' } })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
+                  <FaPlus /> {t('admin.add')}
                 </button>
               </div>
               {advForm && (
                 <form onSubmit={handleSaveAdvantage} className="p-6 bg-zinc-900 rounded-3xl border border-orange-500/50 space-y-4 max-w-xl">
-                  <h3 className="text-lg font-black text-orange-400">{advForm.id ? "Tahrirlash" : "Yangi Qo'shish"}</h3>
+                  <h3 className="text-lg font-black text-orange-400">{advForm.id ? t('admin.edit') : t('admin.add')}</h3>
                   <div className="grid md:grid-cols-4 gap-3">
                     <div className="md:col-span-1">
                       <label className="block text-xs font-bold text-zinc-400 mb-1">Raqam</label>
                       <input type="text" value={advForm.num} onChange={(e) => setAdvForm({ ...advForm, num: e.target.value })} className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" />
                     </div>
                     <div className="md:col-span-3">
-                      <label className="block text-xs font-bold text-zinc-400 mb-1">Sarlavha</label>
-                      <input type="text" required value={advForm.title} onChange={(e) => setAdvForm({ ...advForm, title: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" />
+                      <LField value={advForm.title} onChange={(v) => setAdvForm({ ...advForm, title: v })} label="Sarlavha" />
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-bold text-zinc-400 mb-1">Tavsifi</label>
-                    <textarea rows="2" value={advForm.desc} onChange={(e) => setAdvForm({ ...advForm, desc: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-white outline-none" />
-                  </div>
+                  <LField value={advForm.desc} onChange={(v) => setAdvForm({ ...advForm, desc: v })} label="Tavsifi" textarea />
                   <div className="flex items-center gap-3 pt-2">
-                    <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">Saqlash</button>
-                    <button type="button" onClick={() => setAdvForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">Bekor</button>
+                    <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>
+                    <button type="button" onClick={() => setAdvForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">{t('admin.cancel')}</button>
                   </div>
                 </form>
               )}
@@ -755,8 +763,8 @@ function AdminPanel() {
                   <div key={adv.id} className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex justify-between gap-4">
                     <div>
                       <span className="text-orange-400 font-black text-xs mr-2">[{adv.num}]</span>
-                      <span className="font-extrabold text-sm text-white">{adv.title}</span>
-                      <p className="text-xs text-zinc-400 mt-1">{adv.desc}</p>
+                      <span className="font-extrabold text-sm text-white">{pick(adv.title, lang)}</span>
+                      <p className="text-xs text-zinc-400 mt-1">{pick(adv.desc, lang)}</p>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button onClick={() => setAdvForm(adv)} className="p-2 rounded bg-zinc-800 text-zinc-300 hover:text-white cursor-pointer"><FaEdit className="text-xs" /></button>
@@ -772,14 +780,14 @@ function AdminPanel() {
           {activeTab === 'courses' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-black uppercase text-white">Kurslar Boshqaruvi</h2>
-                <button onClick={() => setCourseForm({ category: 'IT', title: '', ageRange: '9-17 yosh', subtitle: '', description: '', duration: '6 oy', lessonsPerWeek: 'Haftada 3 kun', price: "500 000 so'm / oy", popular: false, image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
-                  <FaPlus /> Yangi Kurs Qo'shish
+                <h2 className="text-xl font-black uppercase text-white">{t('admin.tabs.courses')}</h2>
+                <button onClick={() => setCourseForm({ category: 'IT', title: { uz: '', tg: '', ru: '', en: '' }, ageRange: { uz: '', tg: '', ru: '', en: '' }, subtitle: { uz: '', tg: '', ru: '', en: '' }, description: { uz: '', tg: '', ru: '', en: '' }, duration: '6 oy', lessonsPerWeek: { uz: '', tg: '', ru: '', en: '' }, price: "500 000 so'm / oy", popular: false, image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
+                  <FaPlus /> {t('admin.add')}
                 </button>
               </div>
               {courseForm && (
                 <form onSubmit={handleSaveCourse} className="p-6 bg-zinc-900 rounded-3xl border border-orange-500/50 space-y-4 max-w-2xl">
-                  <h3 className="text-lg font-black text-orange-400">{courseForm.id ? "Kursni Tahrirlash" : "Yangi Kurs"}</h3>
+                  <h3 className="text-lg font-black text-orange-400">{courseForm.id ? t('admin.edit') : t('admin.add')}</h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-zinc-400 mb-1">Kategoriya</label>
@@ -794,30 +802,33 @@ function AdminPanel() {
                         <option value="Huquq">Huquq</option>
                       </select>
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold text-zinc-400 mb-1">Kurs Nomi</label>
-                      <input type="text" required value={courseForm.title} onChange={(e) => setCourseForm({ ...courseForm, title: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-zinc-400 mb-1">Yosh Chegarasi</label>
-                      <input type="text" value={courseForm.ageRange} onChange={(e) => setCourseForm({ ...courseForm, ageRange: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" />
-                    </div>
+                    <LField value={courseForm.title} onChange={(v) => setCourseForm({ ...courseForm, title: v })} label="Kurs Nomi" required />
+                    <LField value={courseForm.ageRange} onChange={(v) => setCourseForm({ ...courseForm, ageRange: v })} label="Yosh Chegarasi" />
                     <div>
                       <label className="block text-xs font-bold text-zinc-400 mb-1">Narxi</label>
                       <input type="text" value={courseForm.price} onChange={(e) => setCourseForm({ ...courseForm, price: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" />
                     </div>
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-400 mb-1">Davomiyligi</label>
+                      <input type="text" value={courseForm.duration} onChange={(e) => setCourseForm({ ...courseForm, duration: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" />
+                    </div>
+                    <LField value={courseForm.lessonsPerWeek} onChange={(v) => setCourseForm({ ...courseForm, lessonsPerWeek: v })} label="Grafik" />
                   </div>
-                  <div><label className="block text-xs font-bold text-zinc-400 mb-1">Sub-sarlavha</label><input type="text" value={courseForm.subtitle} onChange={(e) => setCourseForm({ ...courseForm, subtitle: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-semibold text-white outline-none" /></div>
-                  <div><label className="block text-xs font-bold text-zinc-400 mb-1">Batafsil Tavsifi</label><textarea rows="3" value={courseForm.description} onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-white outline-none" /></div>
+                  <LField value={courseForm.subtitle} onChange={(v) => setCourseForm({ ...courseForm, subtitle: v })} label="Sub-sarlavha" />
+                  <LField value={courseForm.description} onChange={(v) => setCourseForm({ ...courseForm, description: v })} label="Batafsil Tavsifi" textarea />
                   <ImageUploader
                     value={courseForm.image || ''}
                     onChange={(img) => setCourseForm({ ...courseForm, image: img })}
                     label="Kurs Rasmi (URL yoki fayl)"
                     aspectClass="h-28"
                   />
+                  <label className="flex items-center gap-2 text-xs font-bold text-zinc-400 cursor-pointer">
+                    <input type="checkbox" checked={!!courseForm.popular} onChange={(e) => setCourseForm({ ...courseForm, popular: e.target.checked })} className="accent-orange-500" />
+                    Ommabop
+                  </label>
                   <div className="flex items-center gap-3">
-                    <button type="submit" className="px-5 py-2.5 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">Saqlash</button>
-                    <button type="button" onClick={() => setCourseForm(null)} className="px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">Bekor</button>
+                    <button type="submit" className="px-5 py-2.5 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>
+                    <button type="button" onClick={() => setCourseForm(null)} className="px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">{t('admin.cancel')}</button>
                   </div>
                 </form>
               )}
@@ -826,19 +837,19 @@ function AdminPanel() {
                   <div key={c.id} className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800 flex flex-col justify-between space-y-4">
                     <div>
                       {c.image && (
-                        <img src={c.image} alt={c.title} className="w-full h-28 object-cover rounded-xl mb-3" />
+                        <img src={c.image} alt={pick(c.title, lang)} className="w-full h-28 object-cover rounded-xl mb-3" />
                       )}
                       <div className="flex items-center justify-between mb-2">
                         <span className="px-2.5 py-0.5 rounded bg-orange-500/20 text-orange-400 font-bold text-xs">{c.category}</span>
-                        <span className="text-xs text-purple-400 font-bold">{c.ageRange}</span>
+                        <span className="text-xs text-purple-400 font-bold">{pick(c.ageRange, lang)}</span>
                       </div>
-                      <h3 className="font-extrabold text-base text-white">{c.title}</h3>
+                      <h3 className="font-extrabold text-base text-white">{pick(c.title, lang)}</h3>
                       <p className="text-xs text-amber-400 font-bold mt-1">{c.price}</p>
-                      <p className="text-xs text-zinc-400 line-clamp-2 mt-2">{c.description}</p>
+                      <p className="text-xs text-zinc-400 line-clamp-2 mt-2">{pick(c.description, lang)}</p>
                     </div>
                     <div className="flex items-center gap-2 pt-2 border-t border-zinc-800">
-                      <button onClick={() => setCourseForm(c)} className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold flex items-center gap-1 cursor-pointer"><FaEdit /> Tahrirlash</button>
-                      <button onClick={() => store.deleteCourse(c.id)} className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold flex items-center gap-1 cursor-pointer"><FaTrash /> O'chirish</button>
+                      <button onClick={() => setCourseForm(c)} className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold flex items-center gap-1 cursor-pointer"><FaEdit /> {t('admin.edit')}</button>
+                      <button onClick={() => store.deleteCourse(c.id)} className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold flex items-center gap-1 cursor-pointer"><FaTrash /> {t('admin.delete')}</button>
                     </div>
                   </div>
                 ))}
@@ -850,14 +861,14 @@ function AdminPanel() {
           {activeTab === 'teachers' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-black uppercase text-white">O'qituvchilar Boshqaruvi</h2>
-                <button onClick={() => setTeacherForm({ name: '', role: '', subject: 'IT', experience: '5 yillik tajriba', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
-                  <FaPlus /> Yangi Ustoz
+                <h2 className="text-xl font-black uppercase text-white">{t('admin.tabs.teachers')}</h2>
+                <button onClick={() => setTeacherForm({ name: '', role: { uz: '', tg: '', ru: '', en: '' }, subject: 'IT', experience: { uz: '', tg: '', ru: '', en: '' }, image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
+                  <FaPlus /> {t('admin.add')}
                 </button>
               </div>
               {teacherForm && (
                 <form onSubmit={handleSaveTeacher} className="p-6 bg-zinc-900 rounded-3xl border border-orange-500/50 space-y-4 max-w-xl">
-                  <h3 className="text-lg font-black text-orange-400">{teacherForm.id ? "Tahrirlash" : "Yangi Ustoz"}</h3>
+                  <h3 className="text-lg font-black text-orange-400">{teacherForm.id ? t('admin.edit') : t('admin.add')}</h3>
                   <ImageUploader
                     value={teacherForm.image || ''}
                     onChange={(img) => setTeacherForm({ ...teacherForm, image: img })}
@@ -866,7 +877,7 @@ function AdminPanel() {
                   />
                   <div className="space-y-3">
                     <div><label className="block text-xs font-bold text-zinc-400 mb-1">F.I.Sh</label><input type="text" required value={teacherForm.name} onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
-                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">Lavozimi</label><input type="text" value={teacherForm.role} onChange={(e) => setTeacherForm({ ...teacherForm, role: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
+                    <LField value={teacherForm.role} onChange={(v) => setTeacherForm({ ...teacherForm, role: v })} label="Lavozimi" />
                     <div>
                       <label className="block text-xs font-bold text-zinc-400 mb-1">Fan</label>
                       <select value={teacherForm.subject} onChange={(e) => setTeacherForm({ ...teacherForm, subject: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none">
@@ -880,25 +891,26 @@ function AdminPanel() {
                         <option value="Huquq">Huquq</option>
                       </select>
                     </div>
+                    <LField value={teacherForm.experience} onChange={(v) => setTeacherForm({ ...teacherForm, experience: v })} label="Tajriba" />
                   </div>
                   <div className="flex items-center gap-3 pt-2">
-                    <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">Saqlash</button>
-                    <button type="button" onClick={() => setTeacherForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">Bekor</button>
+                    <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>
+                    <button type="button" onClick={() => setTeacherForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">{t('admin.cancel')}</button>
                   </div>
                 </form>
               )}
               <div className="grid md:grid-cols-3 gap-5">
-                {store.teachers.map((t) => (
-                  <div key={t.id} className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center gap-3">
-                    <img src={t.image} alt={t.name} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
+                {store.teachers.map((tch) => (
+                  <div key={tch.id} className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center gap-3">
+                    <img src={tch.image} alt={tch.name} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="font-extrabold text-sm text-white truncate">{t.name}</p>
-                      <p className="text-xs text-orange-400 font-semibold truncate">{t.role}</p>
-                      <span className="text-[10px] text-zinc-400">{t.subject} • {t.experience}</span>
+                      <p className="font-extrabold text-sm text-white truncate">{tch.name}</p>
+                      <p className="text-xs text-orange-400 font-semibold truncate">{pick(tch.role, lang)}</p>
+                      <span className="text-[10px] text-zinc-400">{tch.subject} • {pick(tch.experience, lang)}</span>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <button onClick={() => setTeacherForm(t)} className="p-2 rounded bg-zinc-800 text-zinc-300 hover:text-white cursor-pointer"><FaEdit className="text-xs" /></button>
-                      <button onClick={() => store.deleteTeacher(t.id)} className="p-2 rounded bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white cursor-pointer"><FaTrash className="text-xs" /></button>
+                      <button onClick={() => setTeacherForm(tch)} className="p-2 rounded bg-zinc-800 text-zinc-300 hover:text-white cursor-pointer"><FaEdit className="text-xs" /></button>
+                      <button onClick={() => store.deleteTeacher(tch.id)} className="p-2 rounded bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white cursor-pointer"><FaTrash className="text-xs" /></button>
                     </div>
                   </div>
                 ))}
@@ -910,20 +922,20 @@ function AdminPanel() {
           {activeTab === 'reviews' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-black uppercase text-white">Otzivlar Boshqaruvi</h2>
-                <button onClick={() => setReviewForm({ parentName: '', studentName: '', course: 'IT Kids', comment: '', rating: 5, avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80', videoThumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=500&q=80', youtubeUrl: '' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
-                  <FaPlus /> Yangi Otziv
+                <h2 className="text-xl font-black uppercase text-white">{t('admin.tabs.reviews')}</h2>
+                <button onClick={() => setReviewForm({ parentName: '', studentName: { uz: '', tg: '', ru: '', en: '' }, course: { uz: '', tg: '', ru: '', en: '' }, comment: { uz: '', tg: '', ru: '', en: '' }, rating: 5, avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80', videoThumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=500&q=80', youtubeUrl: '' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
+                  <FaPlus /> {t('admin.add')}
                 </button>
               </div>
               {reviewForm && (
                 <form onSubmit={handleSaveReview} className="p-6 bg-zinc-900 rounded-3xl border border-orange-500/50 space-y-4 max-w-xl">
-                  <h3 className="text-lg font-black text-orange-400">{reviewForm.id ? "Tahrirlash" : "Yangi Otziv"}</h3>
+                  <h3 className="text-lg font-black text-orange-400">{reviewForm.id ? t('admin.edit') : t('admin.add')}</h3>
                   <div className="space-y-3">
                     <div><label className="block text-xs font-bold text-zinc-400 mb-1">Ota-ona Ismi</label><input type="text" required value={reviewForm.parentName} onChange={(e) => setReviewForm({ ...reviewForm, parentName: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
-                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">O'quvchi ismi va yoshi</label><input type="text" value={reviewForm.studentName} onChange={(e) => setReviewForm({ ...reviewForm, studentName: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
+                    <LField value={reviewForm.studentName} onChange={(v) => setReviewForm({ ...reviewForm, studentName: v })} label="O'quvchi ismi va yoshi" />
+                    <LField value={reviewForm.course} onChange={(v) => setReviewForm({ ...reviewForm, course: v })} label="Kurs" />
                     <div><label className="block text-xs font-bold text-red-400 mb-1">YouTube Video Link</label><input type="text" placeholder="https://www.youtube.com/watch?v=..." value={reviewForm.youtubeUrl || ''} onChange={(e) => { const url = e.target.value; const thumb = getYouTubeThumbnail(url); setReviewForm({ ...reviewForm, youtubeUrl: url, videoThumbnail: thumb || reviewForm.videoThumbnail }) }} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
-                    <p className="text-[10px] text-zinc-500 -mt-1">Video qo'yilganda thumbnail avtomatik yuklanadi</p>
-                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">Fikr</label><textarea rows="3" value={reviewForm.comment} onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-white outline-none" /></div>
+                    <LField value={reviewForm.comment} onChange={(v) => setReviewForm({ ...reviewForm, comment: v })} label="Fikr" textarea />
                   </div>
                   <ImageUploader
                     value={reviewForm.videoThumbnail || reviewForm.avatar || ''}
@@ -932,8 +944,8 @@ function AdminPanel() {
                     aspectClass="h-24"
                   />
                   <div className="flex items-center gap-3 pt-2">
-                    <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">Saqlash</button>
-                    <button type="button" onClick={() => setReviewForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">Bekor</button>
+                    <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>
+                    <button type="button" onClick={() => setReviewForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">{t('admin.cancel')}</button>
                   </div>
                 </form>
               )}
@@ -943,9 +955,9 @@ function AdminPanel() {
                     <img src={r.videoThumbnail || r.avatar} alt={r.parentName} className="w-20 h-14 rounded-xl object-cover flex-shrink-0 bg-zinc-950" />
                     <div className="flex-1 min-w-0">
                       <p className="font-extrabold text-sm text-white truncate">{r.parentName}</p>
-                      <p className="text-xs text-sky-400 font-semibold truncate">O'quvchi: {r.studentName}</p>
-                      <p className="text-[11px] text-zinc-500 mt-0.5 truncate">{r.youtubeUrl ? "Video biriktirilgan" : "Video link yo'q"}</p>
-                      <p className="text-xs text-zinc-300 italic mt-1 font-medium line-clamp-2">"{r.comment}"</p>
+                      <p className="text-xs text-sky-400 font-semibold truncate">{t('reviews.student')} {pick(r.studentName, lang)}</p>
+                      <p className="text-[11px] text-zinc-500 mt-0.5 truncate">{r.youtubeUrl ? "Video" : "—"}</p>
+                      <p className="text-xs text-zinc-300 italic mt-1 font-medium line-clamp-2">"{pick(r.comment, lang)}"</p>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button onClick={() => setReviewForm(r)} className="p-2 rounded bg-zinc-800 text-zinc-300 hover:text-white cursor-pointer"><FaEdit className="text-xs" /></button>
@@ -961,14 +973,14 @@ function AdminPanel() {
           {activeTab === 'certs' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-black uppercase text-white">Sertifikatlar Boshqaruvi</h2>
-                <button onClick={() => setCertForm({ title: '', course: 'Web Dasturlash', issuedTo: '', badge: 'Rasmiy Sertifikat', image: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80', description: '' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
-                  <FaPlus /> Yangi Sertifikat
+                <h2 className="text-xl font-black uppercase text-white">{t('admin.tabs.certs')}</h2>
+                <button onClick={() => setCertForm({ title: { uz: '', tg: '', ru: '', en: '' }, course: { uz: '', tg: '', ru: '', en: '' }, issuedTo: '', badge: { uz: '', tg: '', ru: '', en: '' }, image: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80', description: { uz: '', tg: '', ru: '', en: '' } })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
+                  <FaPlus /> {t('admin.add')}
                 </button>
               </div>
               {certForm && (
                 <form onSubmit={handleSaveCert} className="p-6 bg-zinc-900 rounded-3xl border border-orange-500/50 space-y-4 max-w-xl">
-                  <h3 className="text-lg font-black text-orange-400">{certForm.id ? "Tahrirlash" : "Yangi Sertifikat"}</h3>
+                  <h3 className="text-lg font-black text-orange-400">{certForm.id ? t('admin.edit') : t('admin.add')}</h3>
                   <ImageUploader
                     value={certForm.image || ''}
                     onChange={(img) => setCertForm({ ...certForm, image: img })}
@@ -976,22 +988,24 @@ function AdminPanel() {
                     aspectClass="h-24"
                   />
                   <div className="space-y-3">
-                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">Nomi</label><input type="text" required value={certForm.title} onChange={(e) => setCertForm({ ...certForm, title: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
+                    <LField value={certForm.title} onChange={(v) => setCertForm({ ...certForm, title: v })} label="Nomi" required />
                     <div><label className="block text-xs font-bold text-zinc-400 mb-1">Egasi</label><input type="text" value={certForm.issuedTo} onChange={(e) => setCertForm({ ...certForm, issuedTo: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
-                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">Kurs</label><input type="text" value={certForm.course} onChange={(e) => setCertForm({ ...certForm, course: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
+                    <LField value={certForm.course} onChange={(v) => setCertForm({ ...certForm, course: v })} label="Kurs" />
+                    <LField value={certForm.badge} onChange={(v) => setCertForm({ ...certForm, badge: v })} label="Badge" />
+                    <LField value={certForm.description} onChange={(v) => setCertForm({ ...certForm, description: v })} label="Tavsifi" textarea />
                   </div>
                   <div className="flex items-center gap-3 pt-2">
-                    <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">Saqlash</button>
-                    <button type="button" onClick={() => setCertForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">Bekor</button>
+                    <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>
+                    <button type="button" onClick={() => setCertForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">{t('admin.cancel')}</button>
                   </div>
                 </form>
               )}
               <div className="grid md:grid-cols-3 gap-5">
                 {store.certificates.map((cert) => (
                   <div key={cert.id} className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex gap-3 items-center">
-                    {cert.image && <img src={cert.image} alt={cert.title} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />}
+                    {cert.image && <img src={cert.image} alt={pick(cert.title, lang)} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />}
                     <div className="flex-1 min-w-0">
-                      <p className="font-extrabold text-sm text-white truncate">{cert.title}</p>
+                      <p className="font-extrabold text-sm text-white truncate">{pick(cert.title, lang)}</p>
                       <p className="text-xs text-orange-400 font-semibold truncate">{cert.issuedTo}</p>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
@@ -1008,21 +1022,21 @@ function AdminPanel() {
           {activeTab === 'faq' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-black uppercase text-white">FAQ (Savol-Javoblar)</h2>
-                <button onClick={() => setFaqForm({ question: '', answer: '' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
-                  <FaPlus /> Yangi Savol
+                <h2 className="text-xl font-black uppercase text-white">FAQ ({t('admin.tabs.faq')})</h2>
+                <button onClick={() => setFaqForm({ question: { uz: '', tg: '', ru: '', en: '' }, answer: { uz: '', tg: '', ru: '', en: '' } })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
+                  <FaPlus /> {t('admin.add')}
                 </button>
               </div>
               {faqForm && (
                 <form onSubmit={handleSaveFaq} className="p-6 bg-zinc-900 rounded-3xl border border-orange-500/50 space-y-4 max-w-xl">
-                  <h3 className="text-lg font-black text-orange-400">{faqForm.id ? "Tahrirlash" : "Yangi Savol"}</h3>
+                  <h3 className="text-lg font-black text-orange-400">{faqForm.id ? t('admin.edit') : t('admin.add')}</h3>
                   <div className="space-y-3">
-                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">Savol</label><input type="text" required value={faqForm.question} onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
-                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">Javob</label><textarea rows="3" required value={faqForm.answer} onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-white outline-none" /></div>
+                    <LField value={faqForm.question} onChange={(v) => setFaqForm({ ...faqForm, question: v })} label="Savol" required />
+                    <LField value={faqForm.answer} onChange={(v) => setFaqForm({ ...faqForm, answer: v })} label="Javob" textarea required />
                   </div>
                   <div className="flex items-center gap-3 pt-2">
-                    <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">Saqlash</button>
-                    <button type="button" onClick={() => setFaqForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">Bekor</button>
+                    <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>
+                    <button type="button" onClick={() => setFaqForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">{t('admin.cancel')}</button>
                   </div>
                 </form>
               )}
@@ -1030,8 +1044,8 @@ function AdminPanel() {
                 {store.faqs.map((f) => (
                   <div key={f.id} className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between gap-4">
                     <div>
-                      <p className="font-extrabold text-sm text-white">{f.question}</p>
-                      <p className="text-xs text-zinc-400 mt-1">{f.answer}</p>
+                      <p className="font-extrabold text-sm text-white">{pick(f.question, lang)}</p>
+                      <p className="text-xs text-zinc-400 mt-1">{pick(f.answer, lang)}</p>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button onClick={() => setFaqForm(f)} className="p-2 rounded bg-zinc-800 text-zinc-300 hover:text-white cursor-pointer"><FaEdit className="text-xs" /></button>
@@ -1048,22 +1062,22 @@ function AdminPanel() {
 
       {/* Toast notifications (new ariza) */}
       <div className="fixed top-20 right-4 z-[70] space-y-3 w-[340px] max-w-[calc(100vw-2rem)]">
-        {toasts.map((t) => (
-          <div key={t.id} className="animate-toast-in rounded-2xl bg-zinc-900 border border-orange-500/50 shadow-2xl shadow-orange-500/10 overflow-hidden">
+        {toasts.map((tt) => (
+          <div key={tt.id} className="animate-toast-in rounded-2xl bg-zinc-900 border border-orange-500/50 shadow-2xl shadow-orange-500/10 overflow-hidden">
             <div className="flex items-start gap-3 p-4">
               <div className="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 flex items-center justify-center flex-shrink-0">
                 <FaBell />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-black text-orange-400 uppercase tracking-wide">Yangi Ariza</p>
-                <p className="text-sm font-bold text-white truncate mt-0.5">{t.name}</p>
-                <p className="text-xs text-zinc-400 truncate">{t.course}</p>
+                <p className="text-xs font-black text-orange-400 uppercase tracking-wide">{t('admin.toastNew')}</p>
+                <p className="text-sm font-bold text-white truncate mt-0.5">{tt.name}</p>
+                <p className="text-xs text-zinc-400 truncate">{tt.course}</p>
                 <p className="text-[11px] text-zinc-500 mt-0.5 flex items-center gap-1.5">
-                  <FaPhoneAlt className="text-orange-400" /> {t.phone}
+                  <FaPhoneAlt className="text-orange-400" /> {tt.phone}
                 </p>
               </div>
               <button
-                onClick={() => dismissToast(t.id)}
+                onClick={() => dismissToast(tt.id)}
                 className="p-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer flex-shrink-0"
               >
                 <FaTimes />

@@ -1,15 +1,18 @@
 import React, { useState } from 'react'
 import { useStore } from '../store/useStore'
+import { useT, pick } from '../i18n'
 import { FaClock, FaCalendarAlt, FaArrowRight, FaUsers } from 'react-icons/fa'
 
 function Courses() {
+  const { t, lang } = useT()
   const courses = useStore((state) => state.courses)
   const openConsultationModal = useStore((state) => state.openConsultationModal)
   const [selectedCategory, setSelectedCategory] = useState('Barchasi')
+  const allLabel = t('courses.all')
 
-  const categories = ['Barchasi', ...courses.map((c) => c.category).filter((v, i, arr) => arr.indexOf(v) === i)]
+  const categories = [allLabel, ...courses.map((c) => c.category).filter((v, i, arr) => arr.indexOf(v) === i)]
 
-  const filteredCourses = selectedCategory === 'Barchasi'
+  const filteredCourses = selectedCategory === allLabel
     ? courses
     : courses.filter((c) => c.category === selectedCategory)
 
@@ -20,14 +23,14 @@ function Courses() {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div className="space-y-4 max-w-2xl">
             <span className="inline-block px-3 py-1 rounded-md bg-orange-500/10 border border-orange-500/25 text-orange-500 text-xs font-bold uppercase tracking-widest">
-              O'quv dasturlari
+              {t('courses.badge')}
             </span>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
-              Yo'nalishlar va{' '}
-              <span className="text-orange-500">kurslarimiz</span>
+              {t('courses.title1')}{' '}
+              <span className="text-orange-500">{t('courses.title2')}</span>
             </h2>
             <p className="text-zinc-400 text-sm sm:text-base">
-              IT, ingliz va rus tili bo'yicha yoshga mos dasturlar. Quyidagidan farzandingizga mos yo'nalishni tanlang.
+              {t('courses.desc')}
             </p>
           </div>
 
@@ -42,7 +45,7 @@ function Courses() {
                     : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
                 }`}
               >
-                {cat === 'Barchasi' ? 'Barchasi' : cat}
+                {cat}
               </button>
             ))}
           </div>
@@ -57,7 +60,7 @@ function Courses() {
               <div className="relative h-44 overflow-hidden bg-zinc-800">
                 <img
                   src={course.image}
-                  alt={course.title}
+                  alt={pick(course.title, lang)}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 to-transparent" />
@@ -66,47 +69,47 @@ function Courses() {
                 </span>
                 {course.popular && (
                   <span className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-amber-500 text-zinc-950 text-[11px] font-bold">
-                    Ommabop
+                    {t('courses.popular')}
                   </span>
                 )}
               </div>
 
               <div className="p-5 flex flex-col flex-1">
-                <span className="text-xs text-zinc-500 font-semibold">{course.ageRange}</span>
+                <span className="text-xs text-zinc-500 font-semibold">{pick(course.ageRange, lang)}</span>
                 <h3 className="mt-1 text-lg font-extrabold text-white leading-snug group-hover:text-orange-400 transition-colors">
-                  {course.title}
+                  {pick(course.title, lang)}
                 </h3>
-                <p className="mt-1.5 text-xs text-orange-400/90 font-medium">{course.subtitle}</p>
+                <p className="mt-1.5 text-xs text-orange-400/90 font-medium">{pick(course.subtitle, lang)}</p>
 
                 <p className="mt-3 text-sm text-zinc-400 leading-relaxed line-clamp-3">
-                  {course.description}
+                  {pick(course.description, lang)}
                 </p>
 
                 <div className="mt-4 space-y-2 border-t border-zinc-800 pt-4 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2 text-zinc-500"><FaClock className="text-orange-500" /> Davomiyligi</span>
+                    <span className="flex items-center gap-2 text-zinc-500"><FaClock className="text-orange-500" /> {t('courses.duration')}</span>
                     <span className="font-semibold text-white">{course.duration}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2 text-zinc-500"><FaCalendarAlt className="text-orange-500" /> Grafik</span>
-                    <span className="font-semibold text-white text-xs text-right">{course.lessonsPerWeek}</span>
+                    <span className="flex items-center gap-2 text-zinc-500"><FaCalendarAlt className="text-orange-500" /> {t('courses.schedule')}</span>
+                    <span className="font-semibold text-white text-xs text-right">{pick(course.lessonsPerWeek, lang)}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2 text-zinc-500"><FaUsers className="text-orange-500" /> Guruh</span>
-                    <span className="font-semibold text-white">8–10 kishi</span>
+                    <span className="flex items-center gap-2 text-zinc-500"><FaUsers className="text-orange-500" /> {t('courses.group')}</span>
+                    <span className="font-semibold text-white">{t('courses.groupSize')}</span>
                   </div>
                 </div>
 
                 <div className="mt-5 pt-4 border-t border-zinc-800 flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[11px] text-zinc-500">Oylik to'lov</p>
+                    <p className="text-[11px] text-zinc-500">{t('courses.price')}</p>
                     <p className="text-lg font-black text-amber-400">{course.price}</p>
                   </div>
                   <button
-                    onClick={() => openConsultationModal(course.title)}
+                    onClick={() => openConsultationModal(pick(course.title, lang))}
                     className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-zinc-950 text-sm font-bold transition-colors cursor-pointer"
                   >
-                    Yozilish <FaArrowRight className="text-[10px]" />
+                    {t('courses.enroll')} <FaArrowRight className="text-[10px]" />
                   </button>
                 </div>
               </div>

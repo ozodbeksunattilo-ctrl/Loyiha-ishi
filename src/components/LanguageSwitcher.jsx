@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react'
 import { useStore } from '../store/useStore'
 import { LANGS } from '../i18n'
 
-function LanguageSwitcher({ light = false }) {
-  const lang = useStore((state) => state.lang)
-  const setLang = useStore((state) => state.setLang)
+function LanguageSwitcher({ light = false, scope = 'site' }) {
+  const isAdminScope = scope === 'admin'
+  const lang = useStore((state) => (isAdminScope ? state.adminLang : state.siteLang))
+  const setLang = useStore((state) => (isAdminScope ? state.setAdminLang : state.setSiteLang))
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 

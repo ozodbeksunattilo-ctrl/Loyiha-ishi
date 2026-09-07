@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { useStore } from '../store/useStore'
+import { useT, pick } from '../i18n'
 import { getYouTubeEmbed, getYouTubeThumbnail } from '../utils/media'
 import { FaPlay, FaStar, FaTimes, FaQuoteLeft } from 'react-icons/fa'
 
 function Reviews() {
+  const { t, lang } = useT()
   const reviews = useStore((state) => state.reviews)
   const [activeVideoUrl, setActiveVideoUrl] = useState(null)
 
@@ -13,14 +15,14 @@ function Reviews() {
 
         <div className="text-center max-w-2xl mx-auto space-y-4">
           <span className="inline-block px-3 py-1 rounded-md bg-orange-500/10 border border-orange-500/25 text-orange-500 text-xs font-bold uppercase tracking-widest">
-            Otzivlar
+            {t('reviews.badge')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
-          Ota-onalar biz haqimizda{' '}
-          <span className="text-orange-500">nima deydi</span>
+          {t('reviews.title1')}{' '}
+          <span className="text-orange-500">{t('reviews.title2')}</span>
           </h2>
           <p className="text-zinc-400 text-sm">
-            Farzandlari MEGA EDU'da tahsil olayotgan ota-onalarning samimiy fikrlari va video sharhlari.
+            {t('reviews.desc')}
           </p>
         </div>
 
@@ -49,15 +51,15 @@ function Reviews() {
 
               <div className="p-5 flex flex-col flex-1">
                 <FaQuoteLeft className="text-orange-500/60 text-xl" />
-                <p className="mt-2 text-sm text-zinc-300 leading-relaxed italic">"{r.comment}"</p>
+                <p className="mt-2 text-sm text-zinc-300 leading-relaxed italic">"{pick(r.comment, lang)}"</p>
 
                 <div className="mt-4 pt-3 border-t border-zinc-800 flex items-center justify-between">
                   <div>
                     <p className="text-sm font-bold text-white">{r.parentName}</p>
-                    <p className="text-xs text-zinc-500">O'quvchi: {r.studentName}</p>
+                    <p className="text-xs text-zinc-500">{t('reviews.student')} {pick(r.studentName, lang)}</p>
                   </div>
                   <span className="px-2.5 py-1 rounded-md bg-orange-500/15 text-orange-400 text-xs font-semibold">
-                    {r.course}
+                    {pick(r.course, lang)}
                   </span>
                 </div>
               </div>

@@ -15,7 +15,13 @@ export const uz = {
     cta: 'BEPUL KONSULTATSIYA',
     recommended: "Ota-onalarning 98% tavsiya etadi",
     certTitle: 'Rasmiy sertifikat',
-    certDesc: 'Kurs yakunida barcha bitiruvchilarga'
+    certDesc: 'Kurs yakunida barcha bitiruvchilarga',
+    bullets: [
+      '7 yoshdan 20 yoshgacha bolalar va o\u2018smirlar uchun',
+      'IT, Ingliz tili va Rus tili \u2014 3 zamonaviy yo\u2018nalish',
+      'Kichik guruhlar va har bir o\u2018quvchiga individual yondashuv',
+      'Kurs oxirida rasmiy sertifikat taqdim etiladi'
+    ]
   },
   about: {
     badge: 'Biz haqimizda',

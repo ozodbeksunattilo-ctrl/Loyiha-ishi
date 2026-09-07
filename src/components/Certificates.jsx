@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { useStore } from '../store/useStore'
+import { useT, pick } from '../i18n'
 import { FaExpand, FaTimes, FaUser } from 'react-icons/fa'
 
 function Certificates() {
+  const { t, lang } = useT()
   const certificates = useStore((state) => state.certificates)
   const [activeCert, setActiveCert] = useState(null)
 
@@ -12,14 +14,14 @@ function Certificates() {
 
         <div className="text-center max-w-2xl mx-auto space-y-4">
           <span className="inline-block px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/25 text-emerald-500 text-xs font-bold uppercase tracking-widest">
-            Natijalar
+            {t('certs.badge')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
-            Bitiruvchilarimizning{' '}
-            <span className="text-orange-500">sertifikatlari</span>
+            {t('certs.title1')}{' '}
+            <span className="text-orange-500">{t('certs.title2')}</span>
           </h2>
           <p className="text-zinc-400 text-sm">
-            Kursni muvaffaqiyatli yakunlagan o'quvchilarimizga rasmiy sertifikatlar topshiriladi.
+            {t('certs.desc')}
           </p>
         </div>
 
@@ -35,29 +37,29 @@ function Certificates() {
               >
                 <img
                   src={cert.image}
-                  alt={cert.title}
+                  alt={pick(cert.title, lang)}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <span className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/90 text-zinc-950 text-sm font-bold">
-                    <FaExpand /> Katta ko'rish
+                    <FaExpand /> {t('certs.viewLarge')}
                   </span>
                 </div>
               </div>
               <div className="p-5 space-y-3">
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-bold text-white leading-snug text-[15px]">{cert.title}</h3>
+                  <h3 className="font-bold text-white leading-snug text-[15px]">{pick(cert.title, lang)}</h3>
                   <span className="shrink-0 px-2 py-0.5 rounded bg-orange-500/15 text-orange-500 text-[11px] font-bold">
-                    {cert.badge || 'Sertifikat'}
+                    {pick(cert.badge, lang) || t('certs.certBadge')}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-zinc-400">
                   <FaUser className="text-orange-500" />
                   <span className="font-semibold text-zinc-300">{cert.issuedTo}</span>
                   <span className="text-zinc-600">&middot;</span>
-                  <span>{cert.course}</span>
+                  <span>{pick(cert.course, lang)}</span>
                 </div>
-                <p className="text-sm text-zinc-400 line-clamp-2">{cert.description}</p>
+                <p className="text-sm text-zinc-400 line-clamp-2">{pick(cert.description, lang)}</p>
               </div>
             </div>
           ))}
@@ -74,14 +76,14 @@ function Certificates() {
             >
               <FaTimes className="text-lg" />
             </button>
-            <h3 className="text-xl font-extrabold text-white pr-10">{activeCert.title}</h3>
+            <h3 className="text-xl font-extrabold text-white pr-10">{pick(activeCert.title, lang)}</h3>
             <div className="rounded-xl overflow-hidden max-h-[58vh]">
-              <img src={activeCert.image} alt={activeCert.title} className="w-full h-full object-contain bg-zinc-950" />
+              <img src={activeCert.image} alt={pick(activeCert.title, lang)} className="w-full h-full object-contain bg-zinc-950" />
             </div>
             <div className="text-sm text-zinc-300 space-y-1">
-              <p><strong className="text-zinc-100">Ega:</strong> {activeCert.issuedTo}</p>
-              <p><strong className="text-zinc-100">Kurs:</strong> {activeCert.course}</p>
-              <p className="text-zinc-400 text-xs mt-2">{activeCert.description}</p>
+              <p><strong className="text-zinc-100">{t('certs.owner')}</strong> {activeCert.issuedTo}</p>
+              <p><strong className="text-zinc-100">{t('certs.course')}</strong> {pick(activeCert.course, lang)}</p>
+              <p className="text-zinc-400 text-xs mt-2">{pick(activeCert.description, lang)}</p>
             </div>
           </div>
         </div>

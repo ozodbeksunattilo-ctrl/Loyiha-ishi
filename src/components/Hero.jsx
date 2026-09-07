@@ -1,20 +1,17 @@
 import React, { useState } from 'react'
 import { useStore } from '../store/useStore'
+import { useT, pick } from '../i18n'
 import { getYouTubeEmbed } from '../utils/media'
 import { FaPlay, FaTimes, FaCheck, FaStar, FaUsers, FaGraduationCap } from 'react-icons/fa'
 
 function Hero() {
+  const { t, lang } = useT()
   const siteInfo = useStore((state) => state.siteInfo)
   const openConsultationModal = useStore((state) => state.openConsultationModal)
   const [promoOpen, setPromoOpen] = useState(false)
   const promoUrl = getYouTubeEmbed(siteInfo.promoYoutubeUrl)
 
-  const bullets = [
-    '7 yoshdan 20 yoshgacha bolalar va o\u2018smirlar uchun',
-    'IT, Ingliz tili va Rus tili \u2014 3 zamonaviy yo\u2018nalish',
-    'Kichik guruhlar va har bir o\u2018quvchiga individual yondashuv',
-    'Kurs oxirida rasmiy sertifikat taqdim etiladi'
-  ]
+  const bullets = t('hero.bullets')
 
   return (
     <>
@@ -27,17 +24,17 @@ function Hero() {
             <div className="lg:col-span-6 space-y-6">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-zinc-300">
                 <FaUsers className="text-orange-500 text-sm" />
-                {siteInfo.studentCountText || '2500+ o\u2018quvchi ta\u2019lim olmoqda'}
+                {pick(siteInfo.studentCountText, lang) || '2500+ o\u2018quvchi ta\u2019lim olmoqda'}
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black tracking-tight leading-[1.12]">
-                <span className="text-zinc-100">{siteInfo.heroTitleStart || 'Farzandingizni yutuqli kelajakka'}</span>{' '}
-                <span className="text-orange-500">{siteInfo.heroTitleHighlight || 'kelajak kasblari va tillari'}</span>{' '}
-                <span className="text-zinc-100">{siteInfo.heroTitleEnd || 'bilan tayyorlang'}</span>
+                <span className="text-zinc-100">{pick(siteInfo.heroTitleStart, lang) || 'Farzandingizni yutuqli kelajakka'}</span>{' '}
+                <span className="text-orange-500">{pick(siteInfo.heroTitleHighlight, lang) || 'kelajak kasblari va tillari'}</span>{' '}
+                <span className="text-zinc-100">{pick(siteInfo.heroTitleEnd, lang) || 'bilan tayyorlang'}</span>
               </h1>
 
               <p className="text-zinc-400 text-base sm:text-lg leading-relaxed max-w-xl">
-                {siteInfo.heroSubtitle || "7 yoshdan 20 yoshgacha bo'lgan bolalar va o'smirlar uchun IT, Ingliz tili hamda Rus tili kurslari"}
+                {pick(siteInfo.heroSubtitle, lang) || "7 yoshdan 20 yoshgacha bo'lgan bolalar va o'smirlar uchun IT, Ingliz tili hamda Rus tili kurslari"}
               </p>
 
               <ul className="space-y-2.5">
@@ -56,13 +53,13 @@ function Hero() {
                   onClick={() => openConsultationModal()}
                   className="px-7 py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-zinc-950 font-extrabold text-sm transition-all shadow-xl shadow-orange-500/25 active:scale-95 cursor-pointer"
                 >
-                  BEPUL KONSULTATSIYA
+                  {t('hero.cta')}
                 </button>
                 <div className="flex items-center gap-2 text-xs text-zinc-400">
                   <span className="flex text-amber-400">
                     {[...Array(5)].map((_, i) => <FaStar key={i} className="text-xs" />)}
                   </span>
-                  <span>Ota-onalarning 98% tavsiya etadi</span>
+                  <span>{t('hero.recommended')}</span>
                 </div>
               </div>
             </div>
@@ -94,8 +91,8 @@ function Hero() {
                     <FaGraduationCap />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white">Rasmiy sertifikat</p>
-                    <p className="text-[11px] text-zinc-400">Kurs yakunida barcha bitiruvchilarga</p>
+                    <p className="text-sm font-bold text-white">{t('hero.certTitle')}</p>
+                    <p className="text-[11px] text-zinc-400">{t('hero.certDesc')}</p>
                   </div>
                 </div>
               </div>

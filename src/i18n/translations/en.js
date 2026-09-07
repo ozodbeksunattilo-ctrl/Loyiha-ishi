@@ -15,7 +15,13 @@ export const en = {
     cta: 'FREE CONSULTATION',
     recommended: '98% of parents recommend us',
     certTitle: 'Official certificate',
-    certDesc: 'To all graduates upon course completion'
+    certDesc: 'To all graduates upon course completion',
+    bullets: [
+      'For children and teenagers from 7 to 20 years old',
+      'IT, English and Russian — 3 modern directions',
+      'Small groups and an individual approach to every student',
+      'An official certificate is issued at the end of the course'
+    ]
   },
   about: {
     badge: 'About Us',

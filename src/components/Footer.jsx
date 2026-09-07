@@ -1,20 +1,23 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
+import { useT, pick } from '../i18n'
+import LanguageSwitcher from './LanguageSwitcher'
 import { FaPhoneAlt, FaMapMarkerAlt, FaTelegramPlane, FaInstagram, FaGraduationCap, FaUserCog, FaClock, FaArrowRight } from 'react-icons/fa'
 
 function Footer() {
   const navigate = useNavigate()
+  const { t, lang } = useT()
   const siteInfo = useStore((state) => state.siteInfo)
   const openConsultationModal = useStore((state) => state.openConsultationModal)
 
   const quickLinks = [
-    { href: '#courses', label: 'Kurslarimiz' },
-    { href: '#about', label: 'Biz haqimizda' },
-    { href: '#certificates', label: 'Sertifikatlar' },
-    { href: '#reviews', label: 'Otzivlar' },
-    { href: '#teachers', label: 'Jamoa' },
-    { href: '#faq', label: 'Savol-javob' }
+    { href: '#courses', label: t('footer.quickCourses') },
+    { href: '#about', label: t('footer.quickAbout') },
+    { href: '#certificates', label: t('footer.quickCerts') },
+    { href: '#reviews', label: t('footer.quickReviews') },
+    { href: '#teachers', label: t('footer.quickTeachers') },
+    { href: '#faq', label: t('footer.quickFaq') }
   ]
 
   return (
@@ -33,18 +36,18 @@ function Footer() {
               </span>
             </div>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              {siteInfo.tagline || "IT, Ingliz tili va Rus tili zamonaviy ta'lim markazi."}
+              {pick(siteInfo.tagline, lang) || "IT, Ingliz tili va Rus tili zamonaviy ta'lim markazi."}
             </p>
             <button
               onClick={() => openConsultationModal()}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-zinc-950 text-sm font-bold transition-colors cursor-pointer"
             >
-              Bepul sinov darsi <FaArrowRight className="text-[10px]" />
+              {t('footer.trial')} <FaArrowRight className="text-[10px]" />
             </button>
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-zinc-300">Bo'limlar</h4>
+            <h4 className="text-sm font-bold uppercase tracking-widest text-zinc-300">{t('footer.sections')}</h4>
             <ul className="space-y-2.5">
               {quickLinks.map((l) => (
                 <li key={l.href}>
@@ -55,7 +58,7 @@ function Footer() {
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-zinc-300">Bog'lanish</h4>
+            <h4 className="text-sm font-bold uppercase tracking-widest text-zinc-300">{t('footer.contact')}</h4>
             <div className="space-y-2.5 text-sm">
               <a href={`tel:${siteInfo.rawPhone || "998770272300"}`} className="flex items-center gap-2.5 text-zinc-400 hover:text-orange-400 transition-colors">
                 <FaPhoneAlt className="text-orange-500 text-xs" />
@@ -63,17 +66,17 @@ function Footer() {
               </a>
               <div className="flex items-start gap-2.5 text-zinc-400">
                 <FaMapMarkerAlt className="text-orange-500 text-xs mt-1" />
-                <span>{siteInfo.address || "Toshkent shahri, Chilonzor tumani"}</span>
+                <span>{pick(siteInfo.address, lang) || "Toshkent shahri, Chilonzor tumani"}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-400">
                 <FaClock className="text-orange-500 text-xs" />
-                {siteInfo.workingHours || "Dushanba - Shanba: 09:00 - 20:00"}
+                {pick(siteInfo.workingHours, lang) || "Dushanba - Shanba: 09:00 - 20:00"}
               </div>
             </div>
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-zinc-300">Bizga qo'shiling</h4>
+            <h4 className="text-sm font-bold uppercase tracking-widest text-zinc-300">{t('footer.join')}</h4>
             <div className="flex items-center gap-3">
               <a href={siteInfo.telegramUrl || "https://t.me"} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-cyan-400 hover:bg-cyan-500 hover:text-zinc-950 transition-all">
                 <FaTelegramPlane className="text-base" />
@@ -82,19 +85,20 @@ function Footer() {
                 <FaInstagram className="text-base" />
               </a>
             </div>
+            <LanguageSwitcher light />
             <button
               onClick={() => navigate('/admin')}
               className="flex items-center gap-2 text-xs text-zinc-600 hover:text-zinc-300 transition-colors cursor-pointer"
             >
-              <FaUserCog /> Admin Panel
+              <FaUserCog /> {t('footer.admin')}
             </button>
           </div>
 
         </div>
 
         <div className="mt-12 pt-6 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-600">
-          <p>&copy; {new Date().getFullYear()} MEGA EDU. Barcha huquqlar himoyalangan.</p>
-          <p>IT, Ingliz va Rus tili ta'lim platformasi</p>
+          <p>&copy; {new Date().getFullYear()} MEGA EDU. {t('footer.rights')}</p>
+          <p>{t('footer.bottom')}</p>
         </div>
 
       </div>

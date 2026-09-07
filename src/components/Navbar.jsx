@@ -1,20 +1,23 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
+import { useT } from '../i18n'
+import LanguageSwitcher from './LanguageSwitcher'
 import { FaPhoneAlt, FaUserCog, FaGraduationCap } from 'react-icons/fa'
 
 function Navbar() {
   const navigate = useNavigate()
+  const { t } = useT()
   const siteInfo = useStore((state) => state.siteInfo)
   const openConsultationModal = useStore((state) => state.openConsultationModal)
 
   const links = [
-    { href: '#courses', label: 'Kurslar' },
-    { href: '#about', label: 'Biz haqimizda' },
-    { href: '#certificates', label: 'Sertifikatlar' },
-    { href: '#reviews', label: 'Otzivlar' },
-    { href: '#teachers', label: 'Jamoa' },
-    { href: '#faq', label: 'Savol-javob' }
+    { href: '#courses', label: t('navbar.courses') },
+    { href: '#about', label: t('navbar.about') },
+    { href: '#certificates', label: t('navbar.certificates') },
+    { href: '#reviews', label: t('navbar.reviews') },
+    { href: '#teachers', label: t('navbar.teachers') },
+    { href: '#faq', label: t('navbar.faq') }
   ]
 
   return (
@@ -30,7 +33,7 @@ function Navbar() {
               MEGA<span className="text-orange-500">EDU</span>
             </span>
             <span className="text-[10px] text-zinc-500 font-medium tracking-[0.2em] uppercase mt-1">
-              O'quv Markazi
+              {t('navbar.subtitle')}
             </span>
           </div>
         </a>
@@ -48,10 +51,12 @@ function Navbar() {
           <button
             onClick={() => navigate('/admin')}
             className="p-2.5 rounded-xl text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900 transition-all cursor-pointer"
-            title="Admin Panel"
+            title={t('navbar.adminTitle')}
           >
             <FaUserCog className="text-sm" />
           </button>
+
+          <LanguageSwitcher />
 
           <a
             href={`tel:${siteInfo.rawPhone || "998770272300"}`}
@@ -65,7 +70,7 @@ function Navbar() {
             onClick={() => openConsultationModal()}
             className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-zinc-950 font-bold text-sm shadow-lg shadow-orange-500/20 transition-all active:scale-95 cursor-pointer"
           >
-            Ro'yxatdan o'tish
+            {t('navbar.register')}
           </button>
         </div>
 
