@@ -39,5 +39,8 @@ export function pick(obj, lang, field) {
   const val = field ? obj[field] : obj
   if (val == null) return ''
   if (typeof val === 'string') return val
-  return val[lang] ?? val.uz ?? ''
+  if (val[lang]) return val[lang]
+  if (lang === 'ru') return val.en || val.uz || ''
+  if (lang === 'en') return val.ru || val.uz || ''
+  return val.uz || ''
 }

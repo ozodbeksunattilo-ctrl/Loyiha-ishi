@@ -30,7 +30,7 @@ function Reviews() {
           {reviews.map((r) => (
             <div
               key={r.id}
-              className="group flex flex-col rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-orange-500/40 overflow-hidden transition-colors"
+              className="group flex flex-col rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-orange-500/50 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
               <div className="relative h-48 bg-zinc-800 overflow-hidden cursor-pointer" onClick={() => setActiveVideoUrl(r.youtubeUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')}>
                 <img

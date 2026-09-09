@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { useStore } from './store/useStore'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
@@ -24,6 +24,7 @@ function LangApp() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/admin" element={<AdminPanel />} />
       <Route path="/admin/*" element={<AdminPanel />} />
+      <Route path="*" element={<LandingPage />} />
     </Routes>
   )
 }
@@ -50,11 +51,11 @@ function LandingPage() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-orange-500 selection:text-zinc-950">
         <LangApp />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 

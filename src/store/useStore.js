@@ -62,9 +62,9 @@ export const useStore = create(
       siteLang: 'uz',
       adminLang: 'uz',
 
-      setLang: (lang) => set({ lang }),
-      setSiteLang: (lang) => set({ siteLang: lang }),
-      setAdminLang: (lang) => set({ adminLang: lang }),
+      setLang: (l) => set({ lang: l, siteLang: l, adminLang: l }),
+      setSiteLang: (l) => set({ siteLang: l, adminLang: l }),
+      setAdminLang: (l) => set({ adminLang: l, siteLang: l }),
 
       auth: {
         isAuthenticated: false,
@@ -184,9 +184,9 @@ export const useStore = create(
             id: 'app_' + Date.now(),
             name: appData.name,
             phone: appData.phone,
-            course: appData.course || "Umumiy konsultatsiya",
+            course: appData.course || "",
             note: appData.note || "",
-            status: "Yangi",
+            status: "new",
             createdAt: new Date().toLocaleString("uz-UZ", {
               year: 'numeric', month: '2-digit', day: '2-digit',
               hour: '2-digit', minute: '2-digit'
@@ -217,7 +217,64 @@ export const useStore = create(
     }),
     {
       name: 'mega_edu_store_v6',
-      storage: createJSONStorage(() => localStorage)
+      version: 8,
+      storage: createJSONStorage(() => localStorage),
+      migrate: (persisted) => {
+        if (!persisted) return undefined
+        const migrateItem = (item, fields) => {
+          if (!item || typeof item !== 'object') return item
+          const out = { ...item }
+          for (const f of fields) {
+            const v = out[f]
+            if (typeof v === 'string') {
+              out[f] = { uz: v, ru: v, en: v }
+            }
+          }
+          return out
+        }
+        const statusMap = {
+          'Yangi': 'new',
+          "Bog'lanildi": 'contacted',
+          'Qabul qilindi': 'accepted',
+          'Bekor qilindi': 'cancelled',
+          'Новые': 'new',
+          'Связались': 'contacted',
+          'Принято': 'accepted',
+          'Отменено': 'cancelled'
+        }
+        const migrateStatus = (list) => Array.isArray(list)
+          ? list.map((i) => {
+              if (!i || typeof i !== 'object') return i
+              const out = { ...i }
+              const s = out.status
+              out.status = statusMap[s] || (typeof s === 'string' && !['new', 'contacted', 'accepted', 'cancelled'].includes(s) ? 'new' : s)
+              return out
+            })
+          : list
+        return {
+          ...persisted,
+          siteInfo: migrateItem(persisted.siteInfo, ['tagline', 'heroTitleStart', 'heroTitleHighlight', 'heroTitleEnd', 'heroSubtitle', 'studentCountText', 'address', 'workingHours']),
+          advantages: Array.isArray(persisted.advantages)
+            ? persisted.advantages.map((i) => migrateItem(i, ['title', 'desc']))
+            : persisted.advantages,
+          courses: Array.isArray(persisted.courses)
+            ? persisted.courses.map((i) => migrateItem(i, ['category', 'title', 'ageRange', 'subtitle', 'description', 'lessonsPerWeek', 'duration', 'price']))
+            : persisted.courses,
+          certificates: Array.isArray(persisted.certificates)
+            ? persisted.certificates.map((i) => migrateItem(i, ['title', 'course', 'badge', 'description']))
+            : persisted.certificates,
+          reviews: Array.isArray(persisted.reviews)
+            ? persisted.reviews.map((i) => migrateItem(i, ['studentName', 'course', 'comment']))
+            : persisted.reviews,
+          teachers: Array.isArray(persisted.teachers)
+            ? persisted.teachers.map((i) => migrateItem(i, ['subject', 'role', 'experience']))
+            : persisted.teachers,
+          faqs: Array.isArray(persisted.faqs)
+            ? persisted.faqs.map((i) => migrateItem(i, ['question', 'answer']))
+            : persisted.faqs,
+          applications: migrateStatus(persisted.applications)
+        }
+      }
     }
   )
 )

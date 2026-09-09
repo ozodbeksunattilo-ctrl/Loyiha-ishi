@@ -29,7 +29,7 @@ function Certificates() {
           {certificates.map((cert) => (
             <div
               key={cert.id}
-              className="group rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-orange-500/40 overflow-hidden transition-colors"
+              className="group rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-orange-500/50 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
               <div
                 onClick={() => setActiveCert(cert)}

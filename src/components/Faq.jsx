@@ -28,8 +28,8 @@ function Faq() {
             return (
               <div
                 key={faq.id}
-                className={`rounded-xl border transition-colors overflow-hidden ${
-                  isOpen ? 'border-orange-500/50 bg-zinc-900' : 'border-zinc-800 bg-zinc-900/50'
+                className={`rounded-xl border transition-all overflow-hidden ${
+                  isOpen ? 'border-orange-500/50 bg-zinc-900 shadow-lg shadow-orange-500/5' : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
                 }`}
                 style={{ transitionDelay: `${idx * 40}ms` }}
               >

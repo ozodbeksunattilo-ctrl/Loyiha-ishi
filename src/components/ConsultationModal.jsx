@@ -14,12 +14,21 @@ function ConsultationModal() {
   const [formData, setFormData] = useState({
     name: '',
     phone: '+998 ',
-    course: selectedCourseForModal || pick(courses[0]?.title, lang) || 'IT Kids & Robototexnika',
+    course: '',
     note: ''
   })
 
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [errors, setErrors] = useState({})
+
+  useEffect(() => {
+    if (!isOpen) return
+    setFormData((prev) => ({
+      ...prev,
+      course: selectedCourseForModal || pick(courses[0]?.title, lang) || t('modal.courseFallback')
+    }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, lang])
 
   useEffect(() => {
     if (isOpen) {
@@ -157,7 +166,7 @@ function ConsultationModal() {
                   >
                     {courses.map((c) => (
                       <option key={c.id} value={pick(c.title, lang)}>
-                        [{c.category}] {pick(c.title, lang)}
+                        [{pick(c.category, lang)}] {pick(c.title, lang)}
                       </option>
                     ))}
                     <option value={t('modal.generalConsultation')}>{t('modal.generalConsultation')}</option>
@@ -178,7 +187,7 @@ function ConsultationModal() {
 
               <button
                 type="submit"
-                className="w-full py-4 mt-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-zinc-950 font-extrabold text-sm uppercase tracking-wider shadow-xl transition-all cursor-pointer"
+                className="w-full py-4 mt-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-zinc-950 font-extrabold text-sm uppercase tracking-wider shadow-xl shadow-orange-500/25 transition-all cursor-pointer"
               >
                 {t('modal.submit')}
               </button>

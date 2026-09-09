@@ -165,7 +165,7 @@ export const initialAdvantages = [
 export const initialCourses = [
   {
     id: "c1",
-    category: "IT",
+    category: L("IT", "IT", "IT", "IT"),
     title: L(
       "IT KIDS & ROBOTOTEXNIKA",
       "IT KIDS & РОБОТОТЕХНИКА",
@@ -185,15 +185,15 @@ export const initialCourses = [
       "Ваш ребёнок изучает IT через игру – собирает роботов, программирует и создаёт умные устройства. Осваивает проекты C++ и Scratch, работу с платформой Arduino.",
       "Your child learns IT through play – builds robots, programs and creates smart devices. Masters C++ and Scratch projects, working with the Arduino platform."
     ),
-    duration: "6 oy",
+    duration: L("6 oy", "6 моҳ", "6 месяцев", "6 months"),
     lessonsPerWeek: L("Haftada 3 kun (2 soatdan)", "ҳафтае 3 рӯз (аз 2 соат)", "3 дня в неделю (по 2 часа)", "3 days a week (2 hours each)"),
-    price: "450 000 so'm / oy",
+    price: L("450 000 so'm / oy", "450 000 сӯм / моҳ", "450 000 сум / мес", "450,000 UZS / month"),
     popular: true,
     image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80"
   },
   {
     id: "c2",
-    category: "IT",
+    category: L("IT", "IT", "IT", "IT"),
     title: L(
       "WEB DASTURLASH & AI (FRONTEND + BACKEND)",
       "WEB БАРНОМАСОЗӢ & AI (FRONTEND + BACKEND)",
@@ -213,15 +213,15 @@ export const initialCourses = [
       "Ваш ребёнок научится создавать сайты, Telegram-ботов, работать с базами данных и использовать AI. Получит прочные навыки HTML, CSS, JavaScript, React и Python.",
       "Your child learns to build websites, Telegram bots, work with databases and use AI. Gains strong skills in HTML, CSS, JavaScript, React and Python."
     ),
-    duration: "9 oy",
+    duration: L("9 oy", "9 моҳ", "9 месяцев", "9 months"),
     lessonsPerWeek: L("Haftada 3 kun (2 soatdan)", "ҳафтае 3 рӯз (аз 2 соат)", "3 дня в неделю (по 2 часа)", "3 days a week (2 hours each)"),
-    price: "600 000 so'm / oy",
+    price: L("600 000 so'm / oy", "600 000 сӯм / моҳ", "600 000 сум / мес", "600,000 UZS / month"),
     popular: true,
     image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80"
   },
   {
     id: "c3",
-    category: "IT",
+    category: L("IT", "IT", "IT", "IT"),
     title: L(
       "PYTHON & BACKEND DEVELOPMENT",
       "PYTHON & BACKEND DEVELOPMENT",
@@ -241,15 +241,15 @@ export const initialCourses = [
       "Профессиональная разработка серверной части на Python, Django, FastAPI, PostgreSQL и Git. Практический опыт по алгоритмам и структурам данных.",
       "Professional server-side development with Python, Django, FastAPI, PostgreSQL and Git. Hands-on experience with algorithms and data structures."
     ),
-    duration: "8 oy",
+    duration: L("8 oy", "8 моҳ", "8 месяцев", "8 months"),
     lessonsPerWeek: L("Haftada 3 kun (2 soatdan)", "ҳафтае 3 рӯз (аз 2 соат)", "3 дня в неделю (по 2 часа)", "3 days a week (2 hours each)"),
-    price: "650 000 so'm / oy",
+    price: L("650 000 so'm / oy", "650 000 сӯм / моҳ", "650 000 сум / мес", "650,000 UZS / month"),
     popular: false,
     image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80"
   },
   {
     id: "c4",
-    category: "Ingliz tili",
+    category: L("Ingliz tili", "Забони англисӣ", "Английский язык", "English"),
     title: L(
       "GENERAL ENGLISH & SPEAKING CLUB",
       "GENERAL ENGLISH & SPEAKING CLUB",
@@ -269,15 +269,15 @@ export const initialCourses = [
       "Интерактивные уроки и еженедельный Speaking Club с носителями языка. Ученики начинают свободно говорить по-английски в реальных ситуациях.",
       "Interactive lessons and a weekly Speaking Club with native speakers. Students begin speaking English fluently in real-life situations."
     ),
-    duration: "6 oy",
+    duration: L("6 oy", "6 моҳ", "6 месяцев", "6 months"),
     lessonsPerWeek: L("Haftada 3 kun (1.5 soatdan)", "ҳафтае 3 рӯз (аз 1.5 соат)", "3 дня в неделю (по 1.5 часа)", "3 days a week (1.5 hours each)"),
-    price: "400 000 so'm / oy",
+    price: L("400 000 so'm / oy", "400 000 сӯм / моҳ", "400 000 сум / мес", "400,000 UZS / month"),
     popular: true,
     image: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=600&q=80"
   },
   {
     id: "c5",
-    category: "Ingliz tili",
+    category: L("Ingliz tili", "Забони англисӣ", "Английский язык", "English"),
     title: L(
       "IELTS ACCELERATOR (BAND 7.5+)",
       "IELTS ACCELERATOR (BAND 7.5+)",
@@ -297,15 +297,15 @@ export const initialCourses = [
       "Специальные стратегии по Listening, Reading, Writing и Speaking. Ежемесячные бесплатные Mock IELTS и индивидуальный feedback.",
       "Special strategies for Listening, Reading, Writing and Speaking. Monthly free Mock IELTS exams and individual feedback."
     ),
-    duration: "4-6 oy",
+    duration: L("4-6 oy", "4-6 моҳ", "4-6 месяцев", "4-6 months"),
     lessonsPerWeek: L("Haftada 3 kun (2 soatdan)", "ҳафтае 3 рӯз (аз 2 соат)", "3 дня в неделю (по 2 часа)", "3 days a week (2 hours each)"),
-    price: "550 000 so'm / oy",
+    price: L("550 000 so'm / oy", "550 000 сӯм / моҳ", "550 000 сум / мес", "550,000 UZS / month"),
     popular: true,
     image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80"
   },
   {
     id: "c6",
-    category: "Rus tili",
+    category: L("Rus tili", "Забони русӣ", "Русский язык", "Russian"),
     title: L(
       "RUS TILI INTENSIV (SO'ZLASHUV AMALIYOTI)",
       "ЗАБОНИ РУСӢ ИНТЕНСИВ (АМАЛИЯИ ГУФТУГӮ)",
@@ -325,15 +325,15 @@ export const initialCourses = [
       "Интенсивные уроки, ориентированные на общение, без сухой грамматики. Практические занятия для работы и учёбы.",
       "Intensive communication-focused lessons without dry grammar. Practical sessions for work and study."
     ),
-    duration: "3-5 oy",
+    duration: L("3-5 oy", "3-5 моҳ", "3-5 месяцев", "3-5 months"),
     lessonsPerWeek: L("Haftada 3 kun (1.5 soatdan)", "ҳафтае 3 рӯз (аз 1.5 соат)", "3 дня в неделю (по 1.5 часа)", "3 days a week (1.5 hours each)"),
-    price: "380 000 so'm / oy",
+    price: L("380 000 so'm / oy", "380 000 сӯм / моҳ", "380 000 сум / мес", "380,000 UZS / month"),
     popular: false,
     image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80"
   },
   {
     id: "c7",
-    category: "Biologiya",
+    category: L("Biologiya", "Биология", "Биология", "Biology"),
     title: L(
       "BIOLOGIYA (SUN & MILLIY SERTIFIKAT)",
       "БИОЛОГИЯ (SUN & СЕРТИФИКАТИ МИЛЛӢ)",
@@ -353,15 +353,15 @@ export const initialCourses = [
       "Программа по биологии согласно требованиям SUN и Национального сертификата. Разделы генетики, анатомии, ботаники и зоологии закрепляются тестами.",
       "Biology program meeting the SUN and National Certificate requirements. Genetics, anatomy, botany and zoology sections are reinforced with tests."
     ),
-    duration: "8 oy",
+    duration: L("8 oy", "8 моҳ", "8 месяцев", "8 months"),
     lessonsPerWeek: L("Haftada 3 kun (1.5 soatdan)", "ҳафтае 3 рӯз (аз 1.5 соат)", "3 дня в неделю (по 1.5 часа)", "3 days a week (1.5 hours each)"),
-    price: "350 000 so'm / oy",
+    price: L("350 000 so'm / oy", "350 000 сӯм / моҳ", "350 000 сум / мес", "350,000 UZS / month"),
     popular: true,
     image: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=600&q=80"
   },
   {
     id: "c8",
-    category: "Fizika",
+    category: L("Fizika", "Физика", "Физика", "Physics"),
     title: L(
       "FIZIKA (FAN OLIMPIADASI & DTM)",
       "ФИЗИКА (ОЛИМПИАДАИ ФАННӢ & DTM)",
@@ -381,15 +381,15 @@ export const initialCourses = [
       "Разделы механики, электромагнетизма, оптики и термодинамики на высоком уровне. Практика решения логических задач для тестов DTM и олимпиад.",
       "High-level mechanics, electromagnetism, optics and thermodynamics. Practice solving logic problems for DTM tests and olympiads."
     ),
-    duration: "9 oy",
+    duration: L("9 oy", "9 моҳ", "9 месяцев", "9 months"),
     lessonsPerWeek: L("Haftada 3 kun (2 soatdan)", "ҳафтае 3 рӯз (аз 2 соат)", "3 дня в неделю (по 2 часа)", "3 days a week (2 hours each)"),
-    price: "400 000 so'm / oy",
+    price: L("400 000 so'm / oy", "400 000 сӯм / моҳ", "400 000 сум / мес", "400,000 UZS / month"),
     popular: true,
     image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=600&q=80"
   },
   {
     id: "c9",
-    category: "Kimyo",
+    category: L("Kimyo", "Кимиё", "Химия", "Chemistry"),
     title: L(
       "KIMYO (SUN & MILLIY SERTIFIKAT)",
       "КИМИЁ (SUN & СЕРТИФИКАТИ МИЛЛӢ)",
@@ -409,15 +409,15 @@ export const initialCourses = [
       "Органическая и неорганическая химия, периодическая система, уравнения реакций. Практика с задачами по SUN и Национальному сертификату.",
       "Organic and inorganic chemistry, the periodic table, reaction equations. Problem-based practice aligned with SUN and National Certificate."
     ),
-    duration: "8 oy",
+    duration: L("8 oy", "8 моҳ", "8 месяцев", "8 months"),
     lessonsPerWeek: L("Haftada 3 kun (1.5 soatdan)", "ҳафтае 3 рӯз (аз 1.5 соат)", "3 дня в неделю (по 1.5 часа)", "3 days a week (1.5 hours each)"),
-    price: "350 000 so'm / oy",
+    price: L("350 000 so'm / oy", "350 000 сӯм / моҳ", "350 000 сум / мес", "350,000 UZS / month"),
     popular: false,
     image: "https://images.unsplash.com/photo-1603126857599-f6e1573592d6?auto=format&fit=crop&w=600&q=80"
   },
   {
     id: "c10",
-    category: "Tarix",
+    category: L("Tarix", "Таърих", "История", "History"),
     title: L(
       "TARIX (MILLIY SERTIFIKAT & DTM)",
       "ТАЪРИХ (СЕРТИФИКАТИ МИЛЛӢ & DTM)",
@@ -437,15 +437,15 @@ export const initialCourses = [
       "История Узбекистана и всемирная история в хронологическом порядке, с картами и документами. Подготовка по конспекту под Национальный сертификат и DTM.",
       "The history of Uzbekistan and world history in chronological order, with maps and documents. Preparation based on summaries for the National Certificate and DTM."
     ),
-    duration: "7 oy",
+    duration: L("7 oy", "7 моҳ", "7 месяцев", "7 months"),
     lessonsPerWeek: L("Haftada 3 kun (1.5 soatdan)", "ҳафтае 3 рӯз (аз 1.5 соат)", "3 дня в неделю (по 1.5 часа)", "3 days a week (1.5 hours each)"),
-    price: "350 000 so'm / oy",
+    price: L("350 000 so'm / oy", "350 000 сӯм / моҳ", "350 000 сум / мес", "350,000 UZS / month"),
     popular: false,
     image: "https://images.unsplash.com/photo-1461988320302-91bde64fc8e4?auto=format&fit=crop&w=600&q=80"
   },
   {
     id: "c11",
-    category: "Huquq",
+    category: L("Huquq", "Ҳуқуқ", "Право", "Law"),
     title: L(
       "HUQUQ ASOSLARI (YOSH HUQUQSHUNOS)",
       "АСОСҲОИ ҲУҚУҚ (ҲУҚУҚШИНОСИ ҶАВОН)",
@@ -465,9 +465,9 @@ export const initialCourses = [
       "Конституция Республики Узбекистан, права человека, основы гражданского и уголовного права. Подготовка к олимпиаде молодых юристов и разбор реальных ситуаций.",
       "The Constitution of the Republic of Uzbekistan, human rights, fundamentals of civil and criminal law. Preparation for young lawyers olympiad and analysis of real situations."
     ),
-    duration: "6 oy",
+    duration: L("6 oy", "6 моҳ", "6 месяцев", "6 months"),
     lessonsPerWeek: L("Haftada 2 kun (1.5 soatdan)", "ҳафтае 2 рӯз (аз 1.5 соат)", "2 дня в неделю (по 1.5 часа)", "2 days a week (1.5 hours each)"),
-    price: "300 000 so'm / oy",
+    price: L("300 000 so'm / oy", "300 000 сӯм / моҳ", "300 000 сум / мес", "300,000 UZS / month"),
     popular: false,
     image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=80"
   }
@@ -512,7 +512,7 @@ export const initialCertificates = [
       "IELTS 7.5 СЕРТИФИКАТ ВЫСОКОГО ДОСТИЖЕНИЯ",
       "IELTS 7.5 HIGH ACHIEVEMENT CERTIFICATE"
     ),
-    course: "IELTS Intensive",
+    course: L("IELTS Intensive", "IELTS Intensive", "IELTS Intensive", "IELTS Intensive"),
     issuedTo: "Malika Umarova",
     year: "2025",
     badge: L(
@@ -587,7 +587,7 @@ export const initialReviews = [
     id: "r2",
     parentName: "Nazir Rixsiboev",
     studentName: L("Sardor (15 yosh)", "Сардор (15 сола)", "Сардор (15 лет)", "Sardor (15 years)"),
-    course: "Web Dasturlash",
+    course: L("Web Dasturlash", "Web барномасозӣ", "Веб-разработка", "Web Development"),
     comment: L(
       "O'g'lim veb-sayt yaratishni o'rgandi va endi o'z loyihalarini ishlab chiqmoqda. Kelajakda dasturchi bo'laman deb aytadi. MEGA EDU ustozlariga rahmat!",
       "Писари ман сохтани сомонаро ёд гирифт ва ҳоло лоиҳаҳои худашро таҳия мекунад. Мегӯяд, оянда барномасоз мешавам. Раҳмат ба устодони MEGA EDU!",
@@ -653,7 +653,7 @@ export const initialTeachers = [
       "Front-End разработчик и IT-лид",
       "Front-End Developer & IT Lead"
     ),
-    subject: "IT",
+    subject: L("IT", "IT", "IT", "IT"),
     experience: L(
       "5 yillik tajriba",
       "5 соли таҷриба",
@@ -671,7 +671,7 @@ export const initialTeachers = [
       "Ментор Full-Stack",
       "Full-Stack Mentor"
     ),
-    subject: "IT",
+    subject: L("IT", "IT", "IT", "IT"),
     experience: L("4 yillik tajriba", "4 соли таҷриба", "4 года опыта", "4 years experience"),
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80"
   },
@@ -684,7 +684,7 @@ export const initialTeachers = [
       "Старший специалист Back-End",
       "Back-End Senior Specialist"
     ),
-    subject: "IT",
+    subject: L("IT", "IT", "IT", "IT"),
     experience: L("6 yillik tajriba", "6 соли таҷриба", "6 лет опыта", "6 years experience"),
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80"
   },
@@ -697,7 +697,7 @@ export const initialTeachers = [
       "IELTS Master и главный тренер",
       "IELTS Master & Head Trainer"
     ),
-    subject: "Ingliz tili",
+    subject: L("Ingliz tili", "Забони англисӣ", "Английский язык", "English"),
     experience: L("7 yillik tajriba (IELTS 8.5)", "7 соли таҷриба (IELTS 8.5)", "7 лет опыта (IELTS 8.5)", "7 years experience (IELTS 8.5)"),
     image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80"
   },
@@ -710,7 +710,7 @@ export const initialTeachers = [
       "Преподаватель русского и культуры речи",
       "Russian Language and Speech Culture Teacher"
     ),
-    subject: "Rus tili",
+    subject: L("Rus tili", "Забони русӣ", "Русский язык", "Russian"),
     experience: L("5 yillik tajriba", "5 соли таҷриба", "5 лет опыта", "5 years experience"),
     image: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=400&q=80"
   },
@@ -723,7 +723,7 @@ export const initialTeachers = [
       "Преподаватель биологии",
       "Biology Teacher"
     ),
-    subject: "Biologiya",
+    subject: L("Biologiya", "Биология", "Биология", "Biology"),
     experience: L("8 yillik tajriba", "8 соли таҷриба", "8 лет опыта", "8 years experience"),
     image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=400&q=80"
   },
@@ -736,7 +736,7 @@ export const initialTeachers = [
       "Преподаватель физики",
       "Physics Teacher"
     ),
-    subject: "Fizika",
+    subject: L("Fizika", "Физика", "Физика", "Physics"),
     experience: L("9 yillik tajriba", "9 соли таҷриба", "9 лет опыта", "9 years experience"),
     image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80"
   },
@@ -749,7 +749,7 @@ export const initialTeachers = [
       "Преподаватель химии",
       "Chemistry Teacher"
     ),
-    subject: "Kimyo",
+    subject: L("Kimyo", "Кимиё", "Химия", "Chemistry"),
     experience: L("7 yillik tajriba", "7 соли таҷриба", "7 лет опыта", "7 years experience"),
     image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=400&q=80"
   },
@@ -762,7 +762,7 @@ export const initialTeachers = [
       "Преподаватель истории",
       "History Teacher"
     ),
-    subject: "Tarix",
+    subject: L("Tarix", "Таърих", "История", "History"),
     experience: L("10 yillik tajriba", "10 соли таҷриба", "10 лет опыта", "10 years experience"),
     image: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?auto=format&fit=crop&w=400&q=80"
   },
@@ -775,7 +775,7 @@ export const initialTeachers = [
       "Преподаватель права",
       "Law Teacher"
     ),
-    subject: "Huquq",
+    subject: L("Huquq", "Ҳуқуқ", "Право", "Law"),
     experience: L("6 yillik tajriba", "6 соли таҷриба", "6 лет опыта", "6 years experience"),
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80"
   }
@@ -866,7 +866,7 @@ export const initialApplications = [
     phone: "+998 (90) 123-45-67",
     course: "Web Dasturlash & AI",
     note: "Darslar kechki payt bo'lsa yaxshi bo'lardi.",
-    status: "Yangi",
+    status: "new",
     createdAt: new Date(Date.now() - 3600000 * 2).toLocaleString("uz-UZ")
   },
   {
@@ -875,7 +875,7 @@ export const initialApplications = [
     phone: "+998 (97) 765-43-21",
     course: "IELTS Accelerator",
     note: "Qizim uchun IELTS 7.5 kursi bo'yicha ma'lumot olmoqchiman.",
-    status: "Bog'lanildi",
+    status: "contacted",
     createdAt: new Date(Date.now() - 3600000 * 24).toLocaleString("uz-UZ")
   }
 ];

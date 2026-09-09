@@ -12,6 +12,12 @@ function About() {
     { icon: <FaSmile />, value: '60+', label: t('about.stat4') }
   ]
 
+  const handleSectionScroll = (e) => {
+    e.preventDefault()
+    const el = document.getElementById('courses')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
     <section id="about" className="py-16 lg:py-20 bg-zinc-950 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -45,6 +51,7 @@ function About() {
             </ul>
             <a
               href="#courses"
+              onClick={handleSectionScroll}
               className="inline-flex items-center gap-2 text-sm font-bold text-orange-500 hover:text-orange-400 transition-colors"
             >
               {t('about.link')}
@@ -54,8 +61,8 @@ function About() {
 
           <div className="grid grid-cols-2 gap-4">
             {stats.map((s) => (
-              <div key={s.label} className="rounded-2xl bg-zinc-900 border border-zinc-800 p-6 text-center hover:border-orange-500/40 transition-colors">
-                <div className="mx-auto w-12 h-12 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center text-xl mb-3">
+              <div key={s.label} className="rounded-2xl bg-zinc-900 border border-zinc-800 p-6 text-center hover:border-orange-500/50 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300">
+                <div className="mx-auto w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/10 text-orange-500 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition-transform">
                   {s.icon}
                 </div>
                 <p className="text-3xl font-black text-white">{s.value}</p>

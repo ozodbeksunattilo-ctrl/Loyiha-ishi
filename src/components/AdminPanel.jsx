@@ -66,17 +66,31 @@ function AdminPanel() {
   const [reviewForm, setReviewForm] = useState(null)
   const [certForm, setCertForm] = useState(null)
   const [faqForm, setFaqForm] = useState(null)
-  const [statusFilter, setStatusFilter] = useState('Barchasi')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [notifOpen, setNotifOpen] = useState(false)
   const [toasts, setToasts] = useState([])
   const lastAppIdRef = useRef(store.applications[0]?.id || null)
 
-  const statusAll = t('admin.statusAll')
-  const statusNew = t('admin.statusNew')
-  const statusContacted = t('admin.statusContacted')
-  const statusAccepted = t('admin.statusAccepted')
-  const statusCancelled = t('admin.statusCancelled')
-  const statusList = [statusAll, statusNew, statusContacted, statusAccepted, statusCancelled]
+  const statusLabels = {
+    all: t('admin.statusAll'),
+    new: t('admin.statusNew'),
+    contacted: t('admin.statusContacted'),
+    accepted: t('admin.statusAccepted'),
+    cancelled: t('admin.statusCancelled')
+  }
+  const STATUS_OPTIONS = [
+    { code: 'all', label: statusLabels.all },
+    { code: 'new', label: statusLabels.new },
+    { code: 'contacted', label: statusLabels.contacted },
+    { code: 'accepted', label: statusLabels.accepted },
+    { code: 'cancelled', label: statusLabels.cancelled }
+  ]
+  const statusClass = (code) => {
+    if (code === 'new') return 'bg-red-500 text-white'
+    if (code === 'contacted') return 'bg-amber-500 text-zinc-950'
+    if (code === 'accepted') return 'bg-emerald-500 text-white'
+    return 'bg-zinc-700 text-zinc-300'
+  }
 
   const dismissToast = (id) => setToasts((prev) => prev.filter((tt) => tt.id !== id))
 
@@ -144,7 +158,7 @@ function AdminPanel() {
     setLoginPassword('')
   }
 
-  const newLeadsCount = store.applications.filter((a) => a.status === statusNew).length
+  const newLeadsCount = store.applications.filter((a) => a.status === 'new').length
 
   const handleSaveSiteInfo = (e) => {
     e.preventDefault()
@@ -183,7 +197,7 @@ function AdminPanel() {
     setFaqForm(null)
   }
 
-  const filteredApplications = statusFilter === statusAll
+  const filteredApplications = statusFilter === 'all'
     ? store.applications
     : store.applications.filter((a) => a.status === statusFilter)
 
@@ -534,7 +548,7 @@ function AdminPanel() {
                     ) : (
                       store.applications.slice(0, 6).map((app) => (
                         <div key={app.id} className="flex items-start gap-3 px-4 py-3">
-                          <span className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center text-xs flex-shrink-0 ${app.status === statusNew ? 'bg-red-500/15 text-red-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
+                          <span className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center text-xs flex-shrink-0 ${app.status === 'new' ? 'bg-red-500/15 text-red-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
                             <FaInbox />
                           </span>
                           <div className="min-w-0 flex-1">
@@ -543,8 +557,8 @@ function AdminPanel() {
                             <p className="text-[11px] text-zinc-500">{app.phone}</p>
                             <p className="text-[10px] text-zinc-600">{app.createdAt}</p>
                           </div>
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold flex-shrink-0 ${app.status === statusNew ? 'bg-red-500/15 text-red-400' : 'bg-zinc-800 text-zinc-400'}`}>
-                            {app.status}
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold flex-shrink-0 ${app.status === 'new' ? 'bg-red-500/15 text-red-400' : 'bg-zinc-800 text-zinc-400'}`}>
+                            {statusLabels[app.status] || app.status}
                           </span>
                         </div>
                       ))
@@ -589,17 +603,17 @@ function AdminPanel() {
                   <p className="text-xs text-zinc-400 mt-1">{t('admin.appsDesc')}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {statusList.map((st) => (
+                  {STATUS_OPTIONS.map((st) => (
                     <button
-                      key={st}
-                      onClick={() => setStatusFilter(st)}
+                      key={st.code}
+                      onClick={() => setStatusFilter(st.code)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        statusFilter === st
+                        statusFilter === st.code
                           ? 'bg-orange-500 text-zinc-950'
                           : 'bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white'
                       }`}
                     >
-                      {st}
+                      {st.label}
                     </button>
                   ))}
                 </div>
@@ -617,12 +631,8 @@ function AdminPanel() {
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-extrabold text-base text-white">{app.name}</span>
                           <span className="text-xs text-orange-400 font-bold px-2.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">{app.course}</span>
-                          <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
-                            app.status === statusNew ? 'bg-red-500 text-white' :
-                            app.status === statusContacted ? 'bg-amber-500 text-zinc-950' :
-                            app.status === statusAccepted ? 'bg-emerald-500 text-white' : 'bg-zinc-700 text-zinc-300'
-                          }`}>
-                            {app.status}
+                          <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${statusClass(app.status)}`}>
+                            {statusLabels[app.status] || app.status}
                           </span>
                         </div>
                         <div className="flex items-center gap-4 text-xs text-zinc-300">
@@ -641,10 +651,9 @@ function AdminPanel() {
                           onChange={(e) => store.updateApplicationStatus(app.id, e.target.value)}
                           className="px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-700 text-xs font-bold text-white outline-none cursor-pointer"
                         >
-                          <option value={statusNew}>{statusNew}</option>
-                          <option value={statusContacted}>{statusContacted}</option>
-                          <option value={statusAccepted}>{statusAccepted}</option>
-                          <option value={statusCancelled}>{statusCancelled}</option>
+                          {STATUS_OPTIONS.filter((o) => o.code !== 'all').map((o) => (
+                            <option key={o.code} value={o.code}>{o.label}</option>
+                          ))}
                         </select>
                         <button onClick={() => store.deleteApplication(app.id)} className="p-2.5 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-colors cursor-pointer" title={t('admin.titleAttr')}>
                           <FaTrash className="text-xs" />
@@ -666,63 +675,63 @@ function AdminPanel() {
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 mb-1">O'quv Markazi Nomi</label>
+                  <label className="block text-xs font-bold text-zinc-400 mb-1">{t('admin.formCenterName')}</label>
                   <input type="text" value={siteForm.title || ''} onChange={(e) => setSiteForm({ ...siteForm, title: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm font-bold text-white outline-none focus:border-orange-500" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-orange-400 mb-1">Asosiy Telefon Raqami</label>
+                  <label className="block text-xs font-bold text-orange-400 mb-1">{t('admin.formMainPhone')}</label>
                   <input type="text" value={siteForm.headerPhone || ''} onChange={(e) => setSiteForm({ ...siteForm, headerPhone: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-orange-500 text-sm font-extrabold text-orange-400 outline-none" />
                 </div>
                 <div className="md:col-span-2">
-                  <LField value={siteForm.tagline} onChange={(v) => setSiteForm({ ...siteForm, tagline: v })} label="Tagline" textarea />
+                  <LField value={siteForm.tagline} onChange={(v) => setSiteForm({ ...siteForm, tagline: v })} label={t('admin.formTagline')} textarea />
                 </div>
                 <div className="md:col-span-2">
-                  <LField value={siteForm.studentCountText} onChange={(v) => setSiteForm({ ...siteForm, studentCountText: v })} label="O'quvchilar soni matni" />
+                  <LField value={siteForm.studentCountText} onChange={(v) => setSiteForm({ ...siteForm, studentCountText: v })} label={t('admin.formStudentCount')} />
                 </div>
                 <div className="md:col-span-2">
                   <ImageUploader
                     value={siteForm.heroImageUrl || ''}
                     onChange={(img) => setSiteForm({ ...siteForm, heroImageUrl: img })}
-                    label="Hero (Banner) Rasmi"
+                    label={t('admin.formHeroImage')}
                     aspectClass="h-28"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-orange-400 mb-1">Telefon (xalqaro ko'rinish)</label>
+                  <label className="block text-xs font-bold text-orange-400 mb-1">{t('admin.formPhoneIntl')}</label>
                   <input type="text" value={siteForm.rawPhone || ''} onChange={(e) => setSiteForm({ ...siteForm, rawPhone: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-orange-500 text-sm font-extrabold text-orange-400 outline-none" placeholder="998770272300" />
-                  <p className="text-[10px] text-zinc-500 mt-1">Bosish orqali qo'ng'iroq qilish uchun: 998770272300</p>
+                  <p className="text-[10px] text-zinc-500 mt-1">{t('admin.formPhoneHint')}998770272300</p>
                 </div>
                 <div>
-                  <LField value={siteForm.address} onChange={(v) => setSiteForm({ ...siteForm, address: v })} label="Manzil" />
+                  <LField value={siteForm.address} onChange={(v) => setSiteForm({ ...siteForm, address: v })} label={t('admin.formAddress')} />
                 </div>
                 <div>
-                  <LField value={siteForm.workingHours} onChange={(v) => setSiteForm({ ...siteForm, workingHours: v })} label="Ish vaqti" />
+                  <LField value={siteForm.workingHours} onChange={(v) => setSiteForm({ ...siteForm, workingHours: v })} label={t('admin.formWorkingHours')} />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-red-400 mb-1">Promo YouTube Video Link</label>
+                  <label className="block text-xs font-bold text-red-400 mb-1">{t('admin.formPromoYoutube')}</label>
                   <input type="text" placeholder="https://www.youtube.com/watch?v=..." value={siteForm.promoYoutubeUrl || ''} onChange={(e) => setSiteForm({ ...siteForm, promoYoutubeUrl: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm font-semibold text-white outline-none focus:border-orange-500" />
                 </div>
               </div>
               <div className="space-y-4 pt-2">
                 <p className="text-xs font-bold text-zinc-400 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5">
-                  Bosh sahifa sarlavhasi 3 qismdan iborat: 1-qism (oq matn) — 2-qism (to'q sariq matn) — 3-qism (oq matn).
+                  {t('admin.formHeroHint')}
                 </p>
-                <LField value={siteForm.heroTitleStart} onChange={(v) => setSiteForm({ ...siteForm, heroTitleStart: v })} label="Hero Sarlavha (1-qism)" />
-                <LField value={siteForm.heroTitleHighlight} onChange={(v) => setSiteForm({ ...siteForm, heroTitleHighlight: v })} label="Hero Rangli Sarlavha (2-qism)" />
-                <LField value={siteForm.heroTitleEnd} onChange={(v) => setSiteForm({ ...siteForm, heroTitleEnd: v })} label="Hero Sarlavha (3-qism)" />
-                <LField value={siteForm.heroSubtitle} onChange={(v) => setSiteForm({ ...siteForm, heroSubtitle: v })} label="Hero Subtitle" textarea />
+                <LField value={siteForm.heroTitleStart} onChange={(v) => setSiteForm({ ...siteForm, heroTitleStart: v })} label={t('admin.formHeroTitle1')} />
+                <LField value={siteForm.heroTitleHighlight} onChange={(v) => setSiteForm({ ...siteForm, heroTitleHighlight: v })} label={t('admin.formHeroTitle2')} />
+                <LField value={siteForm.heroTitleEnd} onChange={(v) => setSiteForm({ ...siteForm, heroTitleEnd: v })} label={t('admin.formHeroTitle3')} />
+                <LField value={siteForm.heroSubtitle} onChange={(v) => setSiteForm({ ...siteForm, heroSubtitle: v })} label={t('admin.formHeroSubtitle')} textarea />
               </div>
               <div className="grid md:grid-cols-3 gap-4 pt-2">
                 <div>
-                  <label className="block text-xs font-bold text-cyan-400 mb-1">Telegram Link</label>
+                  <label className="block text-xs font-bold text-cyan-400 mb-1">{t('admin.formTelegramLink')}</label>
                   <input type="text" value={siteForm.telegramUrl || ''} onChange={(e) => setSiteForm({ ...siteForm, telegramUrl: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-medium text-white outline-none" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-fuchsia-400 mb-1">Instagram Link</label>
+                  <label className="block text-xs font-bold text-fuchsia-400 mb-1">{t('admin.formInstagramLink')}</label>
                   <input type="text" value={siteForm.instagramUrl || ''} onChange={(e) => setSiteForm({ ...siteForm, instagramUrl: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-medium text-white outline-none" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-red-400 mb-1">YouTube Link</label>
+                  <label className="block text-xs font-bold text-red-400 mb-1">{t('admin.formYouTubeLink')}</label>
                   <input type="text" value={siteForm.youtubeUrl || ''} onChange={(e) => setSiteForm({ ...siteForm, youtubeUrl: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-medium text-white outline-none" />
                 </div>
               </div>
@@ -744,14 +753,14 @@ function AdminPanel() {
                   <h3 className="text-lg font-black text-orange-400">{advForm.id ? t('admin.edit') : t('admin.add')}</h3>
                   <div className="grid md:grid-cols-4 gap-3">
                     <div className="md:col-span-1">
-                      <label className="block text-xs font-bold text-zinc-400 mb-1">Raqam</label>
+                      <label className="block text-xs font-bold text-zinc-400 mb-1">{t('admin.formNumber')}</label>
                       <input type="text" value={advForm.num} onChange={(e) => setAdvForm({ ...advForm, num: e.target.value })} className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" />
                     </div>
                     <div className="md:col-span-3">
-                      <LField value={advForm.title} onChange={(v) => setAdvForm({ ...advForm, title: v })} label="Sarlavha" />
+                      <LField value={advForm.title} onChange={(v) => setAdvForm({ ...advForm, title: v })} label={t('admin.formAdvTitle')} />
                     </div>
                   </div>
-                  <LField value={advForm.desc} onChange={(v) => setAdvForm({ ...advForm, desc: v })} label="Tavsifi" textarea />
+                  <LField value={advForm.desc} onChange={(v) => setAdvForm({ ...advForm, desc: v })} label={t('admin.formAdvDesc')} textarea />
                   <div className="flex items-center gap-3 pt-2">
                     <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>
                     <button type="button" onClick={() => setAdvForm(null)} className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">{t('admin.cancel')}</button>
@@ -781,7 +790,7 @@ function AdminPanel() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-black uppercase text-white">{t('admin.tabs.courses')}</h2>
-                <button onClick={() => setCourseForm({ category: 'IT', title: { uz: '', tg: '', ru: '', en: '' }, ageRange: { uz: '', tg: '', ru: '', en: '' }, subtitle: { uz: '', tg: '', ru: '', en: '' }, description: { uz: '', tg: '', ru: '', en: '' }, duration: '6 oy', lessonsPerWeek: { uz: '', tg: '', ru: '', en: '' }, price: "500 000 so'm / oy", popular: false, image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
+                <button onClick={() => setCourseForm({ category: { uz: 'IT', tg: 'IT', ru: 'IT', en: 'IT' }, title: { uz: '', tg: '', ru: '', en: '' }, ageRange: { uz: '', tg: '', ru: '', en: '' }, subtitle: { uz: '', tg: '', ru: '', en: '' }, description: { uz: '', tg: '', ru: '', en: '' }, duration: { uz: '', tg: '', ru: '', en: '' }, lessonsPerWeek: { uz: '', tg: '', ru: '', en: '' }, price: { uz: '', tg: '', ru: '', en: '' }, popular: false, image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
                   <FaPlus /> {t('admin.add')}
                 </button>
               </div>
@@ -789,42 +798,24 @@ function AdminPanel() {
                 <form onSubmit={handleSaveCourse} className="p-6 bg-zinc-900 rounded-3xl border border-orange-500/50 space-y-4 max-w-2xl">
                   <h3 className="text-lg font-black text-orange-400">{courseForm.id ? t('admin.edit') : t('admin.add')}</h3>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-zinc-400 mb-1">Kategoriya</label>
-                      <select value={courseForm.category} onChange={(e) => setCourseForm({ ...courseForm, category: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none">
-                        <option value="IT">IT</option>
-                        <option value="Ingliz tili">Ingliz tili</option>
-                        <option value="Rus tili">Rus tili</option>
-                        <option value="Biologiya">Biologiya</option>
-                        <option value="Fizika">Fizika</option>
-                        <option value="Kimyo">Kimyo</option>
-                        <option value="Tarix">Tarix</option>
-                        <option value="Huquq">Huquq</option>
-                      </select>
-                    </div>
-                    <LField value={courseForm.title} onChange={(v) => setCourseForm({ ...courseForm, title: v })} label="Kurs Nomi" required />
-                    <LField value={courseForm.ageRange} onChange={(v) => setCourseForm({ ...courseForm, ageRange: v })} label="Yosh Chegarasi" />
-                    <div>
-                      <label className="block text-xs font-bold text-zinc-400 mb-1">Narxi</label>
-                      <input type="text" value={courseForm.price} onChange={(e) => setCourseForm({ ...courseForm, price: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-zinc-400 mb-1">Davomiyligi</label>
-                      <input type="text" value={courseForm.duration} onChange={(e) => setCourseForm({ ...courseForm, duration: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" />
-                    </div>
-                    <LField value={courseForm.lessonsPerWeek} onChange={(v) => setCourseForm({ ...courseForm, lessonsPerWeek: v })} label="Grafik" />
+                    <LField value={courseForm.category} onChange={(v) => setCourseForm({ ...courseForm, category: v })} label={t('admin.formCategory')} />
+                    <LField value={courseForm.title} onChange={(v) => setCourseForm({ ...courseForm, title: v })} label={t('admin.formCourseName')} required />
+                    <LField value={courseForm.ageRange} onChange={(v) => setCourseForm({ ...courseForm, ageRange: v })} label={t('admin.formAgeRange')} />
+                    <LField value={courseForm.price} onChange={(v) => setCourseForm({ ...courseForm, price: v })} label={t('admin.formPrice')} />
+                    <LField value={courseForm.duration} onChange={(v) => setCourseForm({ ...courseForm, duration: v })} label={t('admin.formDuration')} />
+                    <LField value={courseForm.lessonsPerWeek} onChange={(v) => setCourseForm({ ...courseForm, lessonsPerWeek: v })} label={t('admin.formSchedule')} />
                   </div>
-                  <LField value={courseForm.subtitle} onChange={(v) => setCourseForm({ ...courseForm, subtitle: v })} label="Sub-sarlavha" />
-                  <LField value={courseForm.description} onChange={(v) => setCourseForm({ ...courseForm, description: v })} label="Batafsil Tavsifi" textarea />
+                  <LField value={courseForm.subtitle} onChange={(v) => setCourseForm({ ...courseForm, subtitle: v })} label={t('admin.formSubtitle')} />
+                  <LField value={courseForm.description} onChange={(v) => setCourseForm({ ...courseForm, description: v })} label={t('admin.formDescription')} textarea />
                   <ImageUploader
                     value={courseForm.image || ''}
                     onChange={(img) => setCourseForm({ ...courseForm, image: img })}
-                    label="Kurs Rasmi (URL yoki fayl)"
+                    label={t('admin.formCourseImage')}
                     aspectClass="h-28"
                   />
                   <label className="flex items-center gap-2 text-xs font-bold text-zinc-400 cursor-pointer">
                     <input type="checkbox" checked={!!courseForm.popular} onChange={(e) => setCourseForm({ ...courseForm, popular: e.target.checked })} className="accent-orange-500" />
-                    Ommabop
+                    {t('admin.formPopular')}
                   </label>
                   <div className="flex items-center gap-3">
                     <button type="submit" className="px-5 py-2.5 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>
@@ -840,11 +831,11 @@ function AdminPanel() {
                         <img src={c.image} alt={pick(c.title, lang)} className="w-full h-28 object-cover rounded-xl mb-3" />
                       )}
                       <div className="flex items-center justify-between mb-2">
-                        <span className="px-2.5 py-0.5 rounded bg-orange-500/20 text-orange-400 font-bold text-xs">{c.category}</span>
+                        <span className="px-2.5 py-0.5 rounded bg-orange-500/20 text-orange-400 font-bold text-xs">{pick(c.category, lang)}</span>
                         <span className="text-xs text-purple-400 font-bold">{pick(c.ageRange, lang)}</span>
                       </div>
                       <h3 className="font-extrabold text-base text-white">{pick(c.title, lang)}</h3>
-                      <p className="text-xs text-amber-400 font-bold mt-1">{c.price}</p>
+                      <p className="text-xs text-amber-400 font-bold mt-1">{pick(c.price, lang)}</p>
                       <p className="text-xs text-zinc-400 line-clamp-2 mt-2">{pick(c.description, lang)}</p>
                     </div>
                     <div className="flex items-center gap-2 pt-2 border-t border-zinc-800">
@@ -862,7 +853,7 @@ function AdminPanel() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-black uppercase text-white">{t('admin.tabs.teachers')}</h2>
-                <button onClick={() => setTeacherForm({ name: '', role: { uz: '', tg: '', ru: '', en: '' }, subject: 'IT', experience: { uz: '', tg: '', ru: '', en: '' }, image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
+                <button onClick={() => setTeacherForm({ name: '', role: { uz: '', tg: '', ru: '', en: '' }, subject: { uz: 'IT', tg: 'IT', ru: 'IT', en: 'IT' }, experience: { uz: '', tg: '', ru: '', en: '' }, image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80' })} className="px-4 py-2 rounded-xl bg-orange-500 text-zinc-950 font-extrabold text-xs flex items-center gap-2 cursor-pointer">
                   <FaPlus /> {t('admin.add')}
                 </button>
               </div>
@@ -872,26 +863,14 @@ function AdminPanel() {
                   <ImageUploader
                     value={teacherForm.image || ''}
                     onChange={(img) => setTeacherForm({ ...teacherForm, image: img })}
-                    label="Ustoz Rasmi (URL yoki fayl)"
+                    label={t('admin.formTeacherImage')}
                     aspectClass="h-24"
                   />
                   <div className="space-y-3">
-                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">F.I.Sh</label><input type="text" required value={teacherForm.name} onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
-                    <LField value={teacherForm.role} onChange={(v) => setTeacherForm({ ...teacherForm, role: v })} label="Lavozimi" />
-                    <div>
-                      <label className="block text-xs font-bold text-zinc-400 mb-1">Fan</label>
-                      <select value={teacherForm.subject} onChange={(e) => setTeacherForm({ ...teacherForm, subject: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none">
-                        <option value="IT">IT</option>
-                        <option value="Ingliz tili">Ingliz tili</option>
-                        <option value="Rus tili">Rus tili</option>
-                        <option value="Biologiya">Biologiya</option>
-                        <option value="Fizika">Fizika</option>
-                        <option value="Kimyo">Kimyo</option>
-                        <option value="Tarix">Tarix</option>
-                        <option value="Huquq">Huquq</option>
-                      </select>
-                    </div>
-                    <LField value={teacherForm.experience} onChange={(v) => setTeacherForm({ ...teacherForm, experience: v })} label="Tajriba" />
+                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">{t('admin.formFullName')}</label><input type="text" required value={teacherForm.name} onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
+                    <LField value={teacherForm.role} onChange={(v) => setTeacherForm({ ...teacherForm, role: v })} label={t('admin.formRole')} />
+                    <LField value={teacherForm.subject} onChange={(v) => setTeacherForm({ ...teacherForm, subject: v })} label={t('admin.formSubject')} />
+                    <LField value={teacherForm.experience} onChange={(v) => setTeacherForm({ ...teacherForm, experience: v })} label={t('admin.formExperience')} />
                   </div>
                   <div className="flex items-center gap-3 pt-2">
                     <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>
@@ -906,7 +885,7 @@ function AdminPanel() {
                     <div className="flex-1 min-w-0">
                       <p className="font-extrabold text-sm text-white truncate">{tch.name}</p>
                       <p className="text-xs text-orange-400 font-semibold truncate">{pick(tch.role, lang)}</p>
-                      <span className="text-[10px] text-zinc-400">{tch.subject} • {pick(tch.experience, lang)}</span>
+                      <span className="text-[10px] text-zinc-400">{pick(tch.subject, lang)} • {pick(tch.experience, lang)}</span>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button onClick={() => setTeacherForm(tch)} className="p-2 rounded bg-zinc-800 text-zinc-300 hover:text-white cursor-pointer"><FaEdit className="text-xs" /></button>
@@ -931,16 +910,16 @@ function AdminPanel() {
                 <form onSubmit={handleSaveReview} className="p-6 bg-zinc-900 rounded-3xl border border-orange-500/50 space-y-4 max-w-xl">
                   <h3 className="text-lg font-black text-orange-400">{reviewForm.id ? t('admin.edit') : t('admin.add')}</h3>
                   <div className="space-y-3">
-                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">Ota-ona Ismi</label><input type="text" required value={reviewForm.parentName} onChange={(e) => setReviewForm({ ...reviewForm, parentName: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
-                    <LField value={reviewForm.studentName} onChange={(v) => setReviewForm({ ...reviewForm, studentName: v })} label="O'quvchi ismi va yoshi" />
-                    <LField value={reviewForm.course} onChange={(v) => setReviewForm({ ...reviewForm, course: v })} label="Kurs" />
-                    <div><label className="block text-xs font-bold text-red-400 mb-1">YouTube Video Link</label><input type="text" placeholder="https://www.youtube.com/watch?v=..." value={reviewForm.youtubeUrl || ''} onChange={(e) => { const url = e.target.value; const thumb = getYouTubeThumbnail(url); setReviewForm({ ...reviewForm, youtubeUrl: url, videoThumbnail: thumb || reviewForm.videoThumbnail }) }} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
-                    <LField value={reviewForm.comment} onChange={(v) => setReviewForm({ ...reviewForm, comment: v })} label="Fikr" textarea />
+                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">{t('admin.formParentName')}</label><input type="text" required value={reviewForm.parentName} onChange={(e) => setReviewForm({ ...reviewForm, parentName: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
+                    <LField value={reviewForm.studentName} onChange={(v) => setReviewForm({ ...reviewForm, studentName: v })} label={t('admin.formStudentName')} />
+                    <LField value={reviewForm.course} onChange={(v) => setReviewForm({ ...reviewForm, course: v })} label={t('admin.tabs.courses')} />
+                    <div><label className="block text-xs font-bold text-red-400 mb-1">{t('admin.formYouTubeVideo')}</label><input type="text" placeholder="https://www.youtube.com/watch?v=..." value={reviewForm.youtubeUrl || ''} onChange={(e) => { const url = e.target.value; const thumb = getYouTubeThumbnail(url); setReviewForm({ ...reviewForm, youtubeUrl: url, videoThumbnail: thumb || reviewForm.videoThumbnail }) }} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
+                    <LField value={reviewForm.comment} onChange={(v) => setReviewForm({ ...reviewForm, comment: v })} label={t('admin.formComment')} textarea />
                   </div>
                   <ImageUploader
                     value={reviewForm.videoThumbnail || reviewForm.avatar || ''}
                     onChange={(img) => setReviewForm({ ...reviewForm, videoThumbnail: img })}
-                    label="Video Preview Rasmi (URL yoki fayl)"
+                    label={t('admin.formVideoPreview')}
                     aspectClass="h-24"
                   />
                   <div className="flex items-center gap-3 pt-2">
@@ -956,7 +935,7 @@ function AdminPanel() {
                     <div className="flex-1 min-w-0">
                       <p className="font-extrabold text-sm text-white truncate">{r.parentName}</p>
                       <p className="text-xs text-sky-400 font-semibold truncate">{t('reviews.student')} {pick(r.studentName, lang)}</p>
-                      <p className="text-[11px] text-zinc-500 mt-0.5 truncate">{r.youtubeUrl ? "Video" : "—"}</p>
+                      <p className="text-[11px] text-zinc-500 mt-0.5 truncate">{r.youtubeUrl ? t('admin.formVideo') : "—"}</p>
                       <p className="text-xs text-zinc-300 italic mt-1 font-medium line-clamp-2">"{pick(r.comment, lang)}"</p>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
@@ -984,15 +963,15 @@ function AdminPanel() {
                   <ImageUploader
                     value={certForm.image || ''}
                     onChange={(img) => setCertForm({ ...certForm, image: img })}
-                    label="Sertifikat Rasmi (URL yoki fayl)"
+                    label={t('admin.formCertImage')}
                     aspectClass="h-24"
                   />
                   <div className="space-y-3">
-                    <LField value={certForm.title} onChange={(v) => setCertForm({ ...certForm, title: v })} label="Nomi" required />
-                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">Egasi</label><input type="text" value={certForm.issuedTo} onChange={(e) => setCertForm({ ...certForm, issuedTo: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
-                    <LField value={certForm.course} onChange={(v) => setCertForm({ ...certForm, course: v })} label="Kurs" />
-                    <LField value={certForm.badge} onChange={(v) => setCertForm({ ...certForm, badge: v })} label="Badge" />
-                    <LField value={certForm.description} onChange={(v) => setCertForm({ ...certForm, description: v })} label="Tavsifi" textarea />
+                    <LField value={certForm.title} onChange={(v) => setCertForm({ ...certForm, title: v })} label={t('admin.formTitle')} required />
+                    <div><label className="block text-xs font-bold text-zinc-400 mb-1">{t('admin.formCertOwner')}</label><input type="text" value={certForm.issuedTo} onChange={(e) => setCertForm({ ...certForm, issuedTo: e.target.value })} className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-white outline-none" /></div>
+                    <LField value={certForm.course} onChange={(v) => setCertForm({ ...certForm, course: v })} label={t('admin.tabs.courses')} />
+                    <LField value={certForm.badge} onChange={(v) => setCertForm({ ...certForm, badge: v })} label={t('admin.formBadge')} />
+                    <LField value={certForm.description} onChange={(v) => setCertForm({ ...certForm, description: v })} label={t('admin.formAdvDesc')} textarea />
                   </div>
                   <div className="flex items-center gap-3 pt-2">
                     <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>
@@ -1031,8 +1010,8 @@ function AdminPanel() {
                 <form onSubmit={handleSaveFaq} className="p-6 bg-zinc-900 rounded-3xl border border-orange-500/50 space-y-4 max-w-xl">
                   <h3 className="text-lg font-black text-orange-400">{faqForm.id ? t('admin.edit') : t('admin.add')}</h3>
                   <div className="space-y-3">
-                    <LField value={faqForm.question} onChange={(v) => setFaqForm({ ...faqForm, question: v })} label="Savol" required />
-                    <LField value={faqForm.answer} onChange={(v) => setFaqForm({ ...faqForm, answer: v })} label="Javob" textarea required />
+                    <LField value={faqForm.question} onChange={(v) => setFaqForm({ ...faqForm, question: v })} label={t('admin.formQuestion')} required />
+                    <LField value={faqForm.answer} onChange={(v) => setFaqForm({ ...faqForm, answer: v })} label={t('admin.formAnswer')} textarea required />
                   </div>
                   <div className="flex items-center gap-3 pt-2">
                     <button type="submit" className="px-5 py-2 rounded-xl bg-orange-500 text-zinc-950 font-black text-xs">{t('admin.save')}</button>

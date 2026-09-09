@@ -29,7 +29,7 @@ function Teachers() {
           {teachers.map((tch) => (
             <div
               key={tch.id}
-              className="group rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-orange-500/40 overflow-hidden transition-colors"
+              className="group rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-orange-500/50 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
               <div className="relative h-56 overflow-hidden bg-zinc-800">
                 <img
@@ -38,7 +38,7 @@ function Teachers() {
                   className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                 />
                 <span className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-zinc-950/80 backdrop-blur text-orange-400 text-[11px] font-bold border border-zinc-800">
-                  {tch.subject}
+                  {pick(tch.subject, lang)}
                 </span>
               </div>
 

@@ -17,6 +17,9 @@ function Hero() {
     <>
       <section className="relative bg-zinc-950 text-white border-b border-zinc-900 overflow-hidden">
         <div className="absolute -top-32 -right-32 w-[460px] h-[460px] bg-orange-500/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-amber-400/5 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{ backgroundImage: 'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)', backgroundSize: '56px 56px' }} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
@@ -24,17 +27,17 @@ function Hero() {
             <div className="lg:col-span-6 space-y-6">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-zinc-300">
                 <FaUsers className="text-orange-500 text-sm" />
-                {pick(siteInfo.studentCountText, lang) || '2500+ o\u2018quvchi ta\u2019lim olmoqda'}
+                {pick(siteInfo.studentCountText, lang) || t('hero.studentCountFallback')}
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black tracking-tight leading-[1.12]">
-                <span className="text-zinc-100">{pick(siteInfo.heroTitleStart, lang) || 'Farzandingizni yutuqli kelajakka'}</span>{' '}
-                <span className="text-orange-500">{pick(siteInfo.heroTitleHighlight, lang) || 'kelajak kasblari va tillari'}</span>{' '}
-                <span className="text-zinc-100">{pick(siteInfo.heroTitleEnd, lang) || 'bilan tayyorlang'}</span>
+                <span className="text-zinc-100">{pick(siteInfo.heroTitleStart, lang) || t('hero.titleStartFallback')}</span>{' '}
+                <span className="text-orange-500">{pick(siteInfo.heroTitleHighlight, lang) || t('hero.titleHighlightFallback')}</span>{' '}
+                <span className="text-zinc-100">{pick(siteInfo.heroTitleEnd, lang) || t('hero.titleEndFallback')}</span>
               </h1>
 
               <p className="text-zinc-400 text-base sm:text-lg leading-relaxed max-w-xl">
-                {pick(siteInfo.heroSubtitle, lang) || "7 yoshdan 20 yoshgacha bo'lgan bolalar va o'smirlar uchun IT, Ingliz tili hamda Rus tili kurslari"}
+                {pick(siteInfo.heroSubtitle, lang) || t('hero.subtitleFallback')}
               </p>
 
               <ul className="space-y-2.5">
@@ -51,7 +54,7 @@ function Hero() {
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <button
                   onClick={() => openConsultationModal()}
-                  className="px-7 py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-zinc-950 font-extrabold text-sm transition-all shadow-xl shadow-orange-500/25 active:scale-95 cursor-pointer"
+                  className="px-8 py-4 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-zinc-950 font-extrabold text-sm transition-all shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-95 cursor-pointer"
                 >
                   {t('hero.cta')}
                 </button>
@@ -68,7 +71,7 @@ function Hero() {
               <div className="relative rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900 aspect-[4/3] shadow-2xl">
                 <img
                   src={siteInfo.heroImageUrl || 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80'}
-                  alt="MEGA EDU o'quv jarayoni"
+                  alt={t('hero.imageAlt')}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 via-transparent to-transparent" />

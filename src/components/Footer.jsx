@@ -20,6 +20,12 @@ function Footer() {
     { href: '#faq', label: t('footer.quickFaq') }
   ]
 
+  const handleSectionScroll = (e, href) => {
+    e.preventDefault()
+    const el = document.getElementById(href.slice(1))
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
     <footer className="bg-zinc-950 text-white border-t border-zinc-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
@@ -36,7 +42,7 @@ function Footer() {
               </span>
             </div>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              {pick(siteInfo.tagline, lang) || "IT, Ingliz tili va Rus tili zamonaviy ta'lim markazi."}
+              {pick(siteInfo.tagline, lang) || t('footer.taglineFallback')}
             </p>
             <button
               onClick={() => openConsultationModal()}
@@ -51,7 +57,7 @@ function Footer() {
             <ul className="space-y-2.5">
               {quickLinks.map((l) => (
                 <li key={l.href}>
-                  <a href={l.href} className="text-sm text-zinc-500 hover:text-orange-400 transition-colors">{l.label}</a>
+                  <a href={l.href} onClick={(e) => handleSectionScroll(e, l.href)} className="text-sm text-zinc-500 hover:text-orange-400 transition-colors">{l.label}</a>
                 </li>
               ))}
             </ul>
@@ -66,11 +72,11 @@ function Footer() {
               </a>
               <div className="flex items-start gap-2.5 text-zinc-400">
                 <FaMapMarkerAlt className="text-orange-500 text-xs mt-1" />
-                <span>{pick(siteInfo.address, lang) || "Toshkent shahri, Chilonzor tumani"}</span>
+                <span>{pick(siteInfo.address, lang) || t('footer.addressFallback')}</span>
               </div>
               <div className="flex items-center gap-2.5 text-zinc-400">
                 <FaClock className="text-orange-500 text-xs" />
-                {pick(siteInfo.workingHours, lang) || "Dushanba - Shanba: 09:00 - 20:00"}
+                {pick(siteInfo.workingHours, lang) || t('footer.hoursFallback')}
               </div>
             </div>
           </div>

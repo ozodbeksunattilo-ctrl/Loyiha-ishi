@@ -34,7 +34,7 @@ function WhyChooseUs() {
           {advantages.map((a, idx) => (
             <div
               key={a.id || idx}
-              className="rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-orange-500/40 p-6 transition-colors"
+              className="rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-orange-500/50 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 p-6"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="w-11 h-11 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center text-lg">

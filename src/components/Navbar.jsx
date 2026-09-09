@@ -20,12 +20,18 @@ function Navbar() {
     { href: '#faq', label: t('navbar.faq') }
   ]
 
+  const handleSectionScroll = (e, href) => {
+    e.preventDefault()
+    const el = document.getElementById(href.slice(1))
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
     <header className="sticky top-0 z-40 bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[72px] flex items-center justify-between gap-4">
 
         <a href="/" className="flex items-center gap-3 cursor-pointer group shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-zinc-950 shadow-lg shadow-orange-500/20">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-zinc-950 shadow-lg shadow-orange-500/30 group-hover:shadow-orange-500/50 group-hover:scale-105 transition-all">
             <FaGraduationCap className="text-xl" />
           </div>
           <div className="flex flex-col">
@@ -40,7 +46,7 @@ function Navbar() {
 
         <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-zinc-400">
           {links.map((l) => (
-            <a key={l.href} href={l.href} className="hover:text-white transition-colors border-b border-transparent hover:border-orange-500 pb-0.5">
+            <a key={l.href} href={l.href} onClick={(e) => handleSectionScroll(e, l.href)} className="hover:text-white transition-colors border-b border-transparent hover:border-orange-500 pb-0.5">
               {l.label}
             </a>
           ))}
@@ -68,7 +74,7 @@ function Navbar() {
 
           <button
             onClick={() => openConsultationModal()}
-            className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-zinc-950 font-bold text-sm shadow-lg shadow-orange-500/20 transition-all active:scale-95 cursor-pointer"
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-zinc-950 font-bold text-sm shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all active:scale-95 cursor-pointer"
           >
             {t('navbar.register')}
           </button>
